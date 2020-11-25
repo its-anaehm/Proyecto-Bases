@@ -1,0 +1,21 @@
+goto -> Comando mover a la tortuga de lugar
+0.0 -> Posición x
+0.0 -> Posición y
+1 -> grosor del pincel
+#000000 -> color del pincel
+
+circle -> Comando para hacer circulos
+10.0 -> radio del circulo
+1 -> grosor del pincel
+#FF00FF -> color del pincel
+
+beginfill -> Comando para comenzar a rellenar el trazo
+#000000 -> Color para el rellenado
+
+endfill -> Comando para terminar el rellenado
+
+penup -> Detiene el pintado bajo el movimiento de la tortuga
+
+pendown -> Comienza a trazar el pintado de la tortuga
+
+PD: Los comandos beginfill y endfill son propios de la libreria turtle

@@ -1,0 +1,30 @@
+{
+  "Draw": [
+    {
+      "command": "goto",
+      "x": "value",
+      "y": "value",
+      "width": "value",
+      "color": "value"
+    },
+    {
+      "command": "circle",
+      "radius": "value",
+      "width": "value",
+      "color": "value"
+    },
+    {
+      "command": "beginfill",
+      "color": "value"
+    },
+    {
+      "command": "endfill"
+    },
+    {
+      "command": "penup"
+    },
+    {
+      "command": "pendown"
+    }
+  ]
+}
