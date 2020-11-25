@@ -92,7 +92,7 @@ class PyList:
         self.gcList = []
         
     # The append method is used to add commands to the sequence.
-    def append(self,item):/home/moises/Documentos/BD1Project
+    def append(self,item):
         self.gcList = self.gcList + [item]
         
     # This method is used by the undo function. It slices the sequence
