@@ -28,10 +28,9 @@ class GoToCommand:
     # when a command is converted to a string. The string
     # version of the command is how it appears in the graphic
     # file format.
-    def __str__(self):
-        return '{"command": "GoTo", "x": %s, "y": %s, "width": %s,"color": "%s" }' % (self.x,
-        self.y, self.width, self.color)
-
+    def __str__(self, tab=0):
+        return '%s{"command": "GoTo", "x": %s, "y": %s, "width": %s,"color": "%s" }' % ("\t"*tab, self.x, self.y, self.width, self.color)
+        
     def toDict(self):
         return {
             "command": "GoTo",
@@ -53,8 +52,8 @@ class CircleCommand:
         turtle.pencolor(self.color)   
         turtle.circle(self.radius)
     
-    def __str__(self):
-        return '{"command": "Circle", "radius": %s, "width": %s,"color": "%s" }' % (self.radius,
+    def __str__(self, tab=0):
+        return '%s{"command": "Circle", "radius": %s, "width": %s,"color": "%s" }' % ("\t"*tab, self.radius,
         self.width, self.color)
 
         # return "<Command radius="" + str(self.radius) + "" width="" + str(self.width) + "" color="" + self.color + "">Circle</Command>"
@@ -75,8 +74,8 @@ class BeginFillCommand:
         turtle.fillcolor(self.color)
         turtle.begin_fill()
     
-    def __str__(self):
-        return '{"command": "BeginFill", "color": "%s" }' % (self.color)
+    def __str__(self, tab=0):
+        return '%s{"command": "BeginFill", "color": "%s" }' % ("\t"*tab, self.color)
 
         # return "<Command color="" + self.color + "">BeginFill</Command>"
 
@@ -93,8 +92,8 @@ class EndFillCommand:
     def draw(self,turtle):
         turtle.end_fill()
     
-    def __str__(self):
-        return '{"command": "EndFill"}'
+    def __str__(self, tab=0):
+        return '%s{"command": "EndFill"}' % ("\t"*tab)
 
         # return "<Command>EndFill</Command>"
 
@@ -110,8 +109,8 @@ class PenUpCommand:
     def draw(self, turtle):
         turtle.penup()
     
-    def __str__(self):
-        return '{"command": "PenUp"}'
+    def __str__(self, tab=0):
+        return '%s{"command": "PenUp"}' % ("\t"*tab)
 
         # return "<Command>PenUp</Command>"
     
@@ -122,8 +121,8 @@ class PenDownCommand:
     def draw(self, turtle):
         turtle.pendown()    
 
-    def __str__(self):
-        return '{"command": "PenDown"}'
+    def __str__(self, tab=0):
+        return '%s{"command": "PenDown"}' % ("\t"*tab)
 
         # return "<Command>PenDown</Command>"
 
@@ -302,13 +301,21 @@ class DrawingApplication(tkinter.Frame):
 
             file.close()
         """
-        def write(filename):
+        def write(filename, formated=True, tab=1):
             file = open(filename,"w")
-            file.write('{"Draw":[')
-            for cmd in self.graphicsCommands:
-                file.write("%s%s" %(str(cmd),","))
-            file.write('{"command":"end"}')
-            file.write("]}")
+            if (formated):
+
+                file.write('{\n%s"Draw":[\n' % ("\t"*tab))
+                for cmd in self.graphicsCommands:
+                    file.write("%s%s\n" % (cmd.__str__(tab+1),","))
+                file.write('\t\t{"command":"end"}')
+                file.write("\n\t]\n}")
+            else:              
+                file.write('{"Draw":[')
+                for cmd in self.graphicsCommands:
+                    file.write("%s%s" %(str(cmd),","))
+                file.write('{"command":"end"}')
+                file.write("]}")
             file.close()
 
         def saveFile():
