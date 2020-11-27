@@ -5,6 +5,7 @@ import turtle
 import tkinter
 import tkinter.colorchooser
 import tkinter.filedialog
+import json
 import xml.dom.minidom
 
 # The following classes define the different commands that
@@ -28,8 +29,17 @@ class GoToCommand:
     # version of the command is how it appears in the graphic
     # file format.
     def __str__(self):
-        return '<Command x="' + str(self.x) + '" y="' + str(self.y) + '" width="' + str(self.width) + '" color="' + self.color + '">GoTo</Command>'
+        return '{"command": "GoTo", "x": %s, "y": %s, "width": %s,"color": "%s" }' % (self.x,
+        self.y, self.width, self.color)
 
+    def toDict(self):
+        return {
+            "command": "GoTo",
+            "x": str(self.x),
+            "y": str(self.y),
+            "width": str(self.width),
+            "color": str(self.color)
+        }
 
 
 class CircleCommand:
@@ -44,8 +54,18 @@ class CircleCommand:
         turtle.circle(self.radius)
     
     def __str__(self):
-        return '<Command radius="' + str(self.radius) + '" width="' + str(self.width) + '" color="' + self.color + '">Circle</Command>'
+        return '{"command": "Circle", "radius": %s, "width": %s,"color": "%s" }' % (self.radius,
+        self.width, self.color)
 
+        # return "<Command radius="" + str(self.radius) + "" width="" + str(self.width) + "" color="" + self.color + "">Circle</Command>"
+
+    def toDict(self):
+        return {
+            "command": "Circle",
+            "radius": str(self.radius),
+            "width": str(self.width),
+            "color": str(self.color)
+        }
 
 class BeginFillCommand:
     def __init__(self,color):
@@ -56,7 +76,15 @@ class BeginFillCommand:
         turtle.begin_fill()
     
     def __str__(self):
-        return '<Command color="' + self.color + '">BeginFill</Command>'
+        return '{"command": "BeginFill", "color": "%s" }' % (self.color)
+
+        # return "<Command color="" + self.color + "">BeginFill</Command>"
+
+    def toDict(self):
+        return {
+            "command": "BeginFill",
+            "color": str(self.color)
+        }
     
 class EndFillCommand:
     def __init__(self):
@@ -66,7 +94,14 @@ class EndFillCommand:
         turtle.end_fill()
     
     def __str__(self):
-        return "<Command>EndFill</Command>"
+        return '{"command": "EndFill"}'
+
+        # return "<Command>EndFill</Command>"
+
+    def toDict(self):
+        return {
+            "command": "EndFill"
+        }
         
 class PenUpCommand:
     def __init__(self):
@@ -76,7 +111,9 @@ class PenUpCommand:
         turtle.penup()
     
     def __str__(self):
-        return "<Command>PenUp</Command>"
+        return '{"command": "PenUp"}'
+
+        # return "<Command>PenUp</Command>"
     
 class PenDownCommand:
     def __init__(self):
@@ -86,9 +123,16 @@ class PenDownCommand:
         turtle.pendown()    
 
     def __str__(self):
-        return "<Command>PenDown</Command>"
+        return '{"command": "PenDown"}'
+
+        # return "<Command>PenDown</Command>"
+
+    def toDict(self):
+        return {
+            "command": "PenDown"
+        }
     
-# This is the PyList container object. It is meant to hold a 
+# This is the PyList container object. ItgraphicsCommands is meant to hold a
 class PyList:
     def __init__(self):
         self.gcList = []
@@ -124,15 +168,15 @@ class DrawingApplication(tkinter.Frame):
         self.buildWindow()
         self.graphicsCommands = PyList()
 
-    # This method is called to create all the widgets, place them in the GUI,
-    # and define the event handlres for the application.
+    # This method is called to create all the widgets, place them in the GUI,column
+    # and define the event handlers for the application.
     def buildWindow(self):
 
         # The master is the root window. The title is set as below.
         self.master.title("Draw")
 
         # Here isi how to create a menu bar. The tearoff=0 means that menus
-        # can't be separated from the window which is a feature of tkinter.
+        # can"t be separated from the window which is a feature of tkinter.
         bar = tkinter.Menu(self.master)
         fileMenu = tkinter.Menu(bar,tearoff=0)
 
@@ -160,31 +204,28 @@ class DrawingApplication(tkinter.Frame):
 
         # The parse function adds the contents of an XML file to the sequence
         def parse(filename):
-            xmldoc = xml.dom.minidom.parse(filename)
+            JSONData = json.load(open(filename))
 
-            graphicsCommandsElement = xmldoc.getElementsByTagName("GraphicsCommands")[0]
-
-            graphicsCommands = graphicsCommandsElement.getElementsByTagName("Command")
+            graphicsCommands = JSONData["Draw"]
 
             for commandElement in graphicsCommands:
-                print(type(commandElement))
-                command = commandElement.firstChild.data.strip()
-                attr = commandElement.attributes
+                command = commandElement["command"]
+
                 if command == "GoTo":
-                    x = float(attr["x"].value)
-                    y = float(attr["y"].value)
-                    width = float(attr["width"].value)
-                    color = attr["color"].value.strip()
+                    x = commandElement["x"]
+                    y = commandElement["y"]
+                    width = commandElement["width"]
+                    color = commandElement["color"]
                     cmd = GoToCommand(x,y,width,color)
             
                 elif command == "Circle":
-                    radius = float(attr["radius"].value)
-                    width = float(attr["width"].value)
-                    color = attr["color"].value.strip()
+                    radius = commandElement["radius"]
+                    width = commandElement["width"]
+                    color = commandElement["color"]
                     cmd = CircleCommand(radius,width,color)
                 
                 elif command == "BeginFill":
-                    color = attr["color"].value.strip()
+                    color = commandElement["color"]
                     cmd = BeginFillCommand(color)
                 
                 elif command == "EndFill":
@@ -195,6 +236,8 @@ class DrawingApplication(tkinter.Frame):
                 
                 elif command == "PenDown":
                     cmd = PenDownCommand()
+                elif command == "end":
+                    pass
                 else:
                     raise RuntimeError("Unknown command: " + command)
                 
@@ -246,19 +289,28 @@ class DrawingApplication(tkinter.Frame):
             screen.update()
         
         fileMenu.add_command(label="Load Into...",command=addToFile)
-
+        """
         # The write function writes an XML file to the given filename
         def write(filename):
             file = open(filename, "w")
-            file.write('<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n')
-            file.write('<GraphicsCommands>\n')
+            file.write("<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n"")
+            file.write("<GraphicsCommands>\n")
             for cmd in self.graphicsCommands:
-                file.write('    '+str(cmd)+"\n")
+                file.write("    "+str(cmd)+"\n")
             
-            file.write('</GraphicsCommands>\n')
+            file.write("</GraphicsCommands>\n"")
 
             file.close()
-        
+        """
+        def write(filename):
+            file = open(filename,"w")
+            file.write('{"Draw":[')
+            for cmd in self.graphicsCommands:
+                file.write("%s%s" %(str(cmd),","))
+            file.write('{"command":"end"}')
+            file.write("]}")
+            file.close()
+
         def saveFile():
             filename = tkinter.filedialog.asksaveasfilename(title="Save Picture As...")
             write(filename)
