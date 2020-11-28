@@ -17,20 +17,16 @@ class Encryptor:
     def __init__(self):
         pass
 
-    def encrypt(self, data, password):
-        encoded_chars = []
+    def encrypt(self,data, password):
+        encode = []
         for i in range(len(data)):
-            key_c = password[i % len(password)]
-            encoded_c = chr(ord(data[i]) + ord(key_c) % 256)
-            encoded_chars.append(encoded_c)
-        encoded_string = "".join(encoded_chars)
-        return encoded_string
+            passChar = password[i%len(password)]
+            encode.append(chr(ord(data[i] )+ ord(passChar)))
+        return "".join(encode)
 
-    def decrypt(self, data, password):
-        encoded_chars = []
+    def decrypt(self,data, password):
+        encode = []
         for i in range(len(data)):
-            key_c = password[i % len(password)]
-            encoded_c = chr(ord(data[i]) - ord(key_c) % 256)
-            encoded_chars.append(encoded_c)
-        encoded_string = "".join(encoded_chars)
-        return encoded_string
+            passChar = password[i%len(password)]
+            encode.append(chr(ord(data[i]) - ord(passChar)))
+        return "".join(encode)
