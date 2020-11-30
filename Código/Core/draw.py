@@ -6,7 +6,8 @@ import tkinter
 import tkinter.colorchooser
 import tkinter.filedialog
 import json
-import xml.dom.minidom
+from AddUserGUI import AddUserGUI
+from tkinter import Tk
 
 # The following classes define the different commands that
 # are supported by the drawing application.
@@ -486,7 +487,16 @@ class DrawingApplication(tkinter.Frame):
                     cmd.draw(theTurtle)
                 screen.update()
                 screen.listen()
-        
+
+        def addUser():
+            root = Tk()
+            root.title("Add User")
+            addUserGUI = AddUserGUI(root)
+            root.mainloop()
+
+        fileMenu.add_command(command=addUser, label="Add User")
+
+
         screen.onkeypress(undoHandler, "u")
         screen.listen()
 
