@@ -99,6 +99,90 @@ CREATE TABLE Binnacle(
 -- CALL sp_addUser("sebastian", "holi");
 -- CALL sp_addUser("odin", "soidiosito");
 
+DELIMITER $$
+
+    CREATE TRIGGER bin_addUser AFTER INSERT ON Users
+        FOR EACH ROW
+        BEGIN
+
+            INSERT INTO Binnacle(userId, tex_event) VALUES(
+                (SELECT Us.id
+                    FROM Users Us
+                    WHERE ((SUBSTRING_INDEX(CURRENT_USER(), "@",1))) = Us.var_user),
+                "Inserción de Usuario"
+            );
+
+        END $$
+
+    CREATE TRIGGER bin_deleteUser AFTER DELETE ON Users
+        FOR EACH ROW
+        BEGIN
+
+            INSERT INTO Binnacle(userId, tex_event) VALUES(
+                (SELECT Us.id
+                    FROM Users Us
+                    WHERE ((SUBSTRING_INDEX(CURRENT_USER(), "@",1))) = Us.var_user),
+                "Eliminación de Usuario"
+            );
+
+        END $$
+
+    CREATE TRIGGER bin_updateUser AFTER UPDATE ON Users
+        FOR EACH ROW
+        BEGIN
+
+            INSERT INTO Binnacle(userId, tex_event) VALUES(
+                (SELECT Us.id
+                    FROM Users Us
+                    WHERE ((SUBSTRING_INDEX(CURRENT_USER(), "@",1))) = Us.var_user),
+                "Modificación de Usuario"
+            );
+
+        END $$
+
+    CREATE TRIGGER bin_addDraw AFTER INSERT ON Draws
+        FOR EACH ROW
+        BEGIN
+
+            INSERT INTO Binnacle(userId, tex_event) VALUES(
+                (SELECT Us.id
+                    FROM Users Us
+                    WHERE ((SUBSTRING_INDEX(CURRENT_USER(), "@",1))) = Us.var_user),
+                "Inserción de Dibujo"
+            );
+
+        END $$
+    
+    CREATE TRIGGER bin_deleteDraw AFTER DELETE ON Draws
+        FOR EACH ROW
+        BEGIN
+
+            INSERT INTO Binnacle(userId, tex_event) VALUES(
+                (SELECT Us.id
+                    FROM Users Us
+                    WHERE ((SUBSTRING_INDEX(CURRENT_USER(), "@",1))) = Us.var_user),
+                "Eliminación de Dibujo"
+            );
+
+        END $$
+    
+    CREATE TRIGGER bin_modifyDraw AFTER INSERT ON Draws
+        FOR EACH ROW
+        BEGIN
+
+            INSERT INTO Binnacle(userId, tex_event) VALUES(
+                (SELECT Us.id
+                    FROM Users Us
+                    WHERE ((SUBSTRING_INDEX(CURRENT_USER(), "@",1))) = Us.var_user),
+                "Modificación de Dibujo"
+            );
+
+        END $$
+    
+
+DELIMITER ;
+
+
 SELECT * FROM Users;
 
 SELECT user FROM mysql.user;
