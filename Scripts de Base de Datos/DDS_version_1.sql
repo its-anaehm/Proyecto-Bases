@@ -1,5 +1,5 @@
 
-DROP DATABASE DBA;
+DROP DATABASE IF EXISTS DBA;
 
 CREATE DATABASE DBA;
 
@@ -33,6 +33,10 @@ CREATE TABLE Binnacle(
         REFERENCES Users(id)
         ON DELETE CASCADE
         ON UPDATE CASCADE
+);
+
+INSERT INTO Users(var_user, var_pass) VALUES(
+    'admin', 'admin'
 );
 
 -- DELIMITER $$

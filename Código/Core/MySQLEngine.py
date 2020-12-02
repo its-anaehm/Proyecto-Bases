@@ -1,5 +1,6 @@
 import mysql.connector
 from mysql.connector import Error
+import configparser
 
 """
     @author: emilio.sosa@unah.hn
@@ -7,18 +8,21 @@ from mysql.connector import Error
     @version: 1.0
 """
 
+
 class MySQLEngine:
 
-    def __init__(self, config):
-        self.server = config.server
-        self.port = config.port
-        self.user = config.user
-        self.password = config.password
-        self.database = config.database
+    def __init__(self):
 
-        self.authentication(self.user, self.password)
-        
-        
+        # Reading data from config file
+        self.config = configparser.ConfigParser()
+        self.config.read("./Core/conectionConfig.ini")
+        self.config.sections()
+        self.port = self.config['DEFAULT']['port']
+        self.database = self.config['DEFAULT']['database']
+        self.server = self.config['DEFAULT']['host']
+
+        self.con = None
+
     """
     def start(self):
         self.con = mysql.connector.connect(
@@ -38,54 +42,52 @@ class MySQLEngine:
     """
 
     def connectionCheck(self):
-        if(self.con.is_connected()):
-            return True
-        else:
-            return False
-
+        return self.con
+    
     def authentication(self, userName, password):
         try:
             self.con = mysql.connector.connect(
-                host = self.server,
-                port = self.port,
-                userName = self.user,
-                password = self.password,
-                database = self.database
+                host=self.server,
+                port=self.port,
+                username=userName,
+                password=password,
+                database=self.database
 
             )
 
             self.link = self.con.cursor()
 
         except mysql.connector.Error as error:
+            self.con = None
             print("Usuario no válido. {}".format(error))
-
+    
     def select(self, query):
         self.link.execute(query)
-        return self.link.fetchall()    
+        return self.link.fetchall()
 
     def closeDataBase(self):
-        #Cierre
+        # Cierre
         self.link.close()
         self.con.close()
 
         print("Connection ended.")
-
 
     def addUser(self, userName, userPassword):
         try:
 
             self.mysql_insert = "INSERT INTO Users(var_user, var_pass) VALUES (%s, %s)"
             self.data = (userName, userPassword)
-           
-            self.mysql_create = "CREATE USER '%s'@'localhost' IDENTIFIED BY '%s'" % (userName, userPassword)
+
+            self.mysql_create = "CREATE USER '%s'@'localhost' IDENTIFIED BY '%s'" % (
+                userName, userPassword)
 
             self.link.execute(self.mysql_insert, self.data)
             self.link.execute(self.mysql_create)
 
             self.con.commit()
             print("User added")
-        
-        except mysql.connector.Error as error:
+
+        except mysql.connector.Error as error:            
             print("Inserción fallida {}".format(error))
 
     def dropUser(self, userName):
@@ -98,10 +100,9 @@ class MySQLEngine:
             self.con.commit()
 
             print("User dropped")
-        
+
         except mysql.connector.Error as error:
             print("Eliminación fallida {}".format(error))
-
 
     def alterUser(self, userName, newUserName):
         try:
@@ -117,7 +118,7 @@ class MySQLEngine:
         except mysql.connector.Error as error:
             print("Actualización de Usuario fallida. {}".format(error))
 
-    #def insertDraw(self, userName, drawConfig):
+    # def insertDraw(self, userName, drawConfig):
 
     def dropDraw(self, userID, drawName):
         try:
@@ -134,24 +135,17 @@ class MySQLEngine:
 
     def retrieveDraws(self, userName):
         try:
-            self.mysql_drawQuery = "SELECT * FROM Draws WHERE var_name = %s" % (userName)
+            self.mysql_drawQuery = "SELECT * FROM Draws WHERE var_name = %s" % (
+                userName)
 
             self.result = self.select(self.mysql_drawQuery)
-            for name,draw in self.result:
+            for name, draw in self.result:
                 return ("")
-            ## Aquí se deben devolver las configuraciones de los dibujos guardados y se deben desplegar en la interfaz.
+            # Aquí se deben devolver las configuraciones de los dibujos guardados y se deben desplegar en la interfaz.
 
         except mysql.connector.Error as error:
             print("No se han podido recuperar los dibujos {}".format(error))
 
 
 
-
-    
-    
-    
-        
-
-    
-
-        
+MySQLEngine()
