@@ -1,6 +1,6 @@
 from tkinter import ttk
 from tkinter.ttk import Style
-from LoginGUI import LoginGUI
+from .LoginGUI import LoginGUI
 
 class WelcomeGUI(ttk.Frame):
     def __init__(self,parent):

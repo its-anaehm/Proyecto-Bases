@@ -6,7 +6,7 @@ import tkinter
 import tkinter.colorchooser
 import tkinter.filedialog
 import json
-from AddUserGUI import AddUserGUI
+from .AddUserGUI import AddUserGUI
 from tkinter import Tk
 
 # The following classes define the different commands that

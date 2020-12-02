@@ -1,5 +1,5 @@
 from tkinter import ttk
-from draw import DrawingApplication
+from .draw import DrawingApplication
 
 class LoginGUI(ttk.Frame):
     def __init__(self, parent):
