@@ -72,6 +72,17 @@ class MySQLEngine:
 
         print("Connection ended.")
 
+    def userLoginRegister(self, userName):
+        try :
+            self.mysql_register = "INSERT INTO Binnacle(userId, tex_event) VALUES((SELECT Us.id FROM Users Us WHERE '%s' = Us.var_user), 'Inicio de Sesión')" % (userName)
+
+            self.link.execute(self.mysql_register)
+            self.con.commit()
+            print("Registro añadido a Bitácora")
+        
+        except mysql.connector.Error as error:
+            print("Operación fallida. {}".format(error))
+
     def addUser(self, userName, userPassword):
         try:
 
@@ -81,8 +92,11 @@ class MySQLEngine:
             self.mysql_create = "CREATE USER '%s'@'localhost' IDENTIFIED BY '%s'" % (
                 userName, userPassword)
 
+            self.mysql_grant = "GRANT INSERT ON %s.Draws TO '%s'@'localhost'" % (self.database, userName)
+
             self.link.execute(self.mysql_insert, self.data)
             self.link.execute(self.mysql_create)
+            self.link.execute(self.mysql_grant)
 
             self.con.commit()
             print("User added")
