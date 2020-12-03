@@ -90,19 +90,23 @@ class MySQLEngine:
 
             self.mysql_create = "CREATE USER '%s'@'localhost' IDENTIFIED BY '%s'" % (
                 userName, userPassword)
+            self.link.execute(self.mysql_create)
 
             if not admin:
-                self.mysql_grant = "GRANT INSERT ON %s.Draws TO '%s'@'localhost'" % (self.database, userName)
+                self.mysql_grant = "GRANT INSERT, SELECT ON %s.Draws TO '%s'@'localhost'" % (self.database, userName)
                 self.mysql_insert = "INSERT INTO Users(var_user, var_pass, var_category) VALUES (%s, %s, 'Operador')"
                 self.data = (userName, userPassword)
+                self.link.execute(self.mysql_insert, self.data)
+                self.link.execute(self.mysql_grant)
             else:
+                self.mysql_grant = "GRANT ALL PRIVILEGES ON *.* TO '%s'@'localhost'" % (userName)
+                self.mysql_grantOption = "GRANT GRANT OPTION ON %s.* TO '%s'@'localhost'" % (self.database, userName)
                 self.mysql_insert = "INSERT INTO Users(var_user, var_pass, var_category) VALUES (%s, %s, 'Administrador')"
                 self.data = (userName, userPassword)
-                self.mysql_grant = "GRANT ALL PRIVILEGES ON *.* TO '%s'@'localhost'" % (userName)
+                self.link.execute(self.mysql_grant)
+                self.link.execute(self.mysql_grantOption)
+                self.link.execute(self.mysql_insert, self.data)
 
-            self.link.execute(self.mysql_insert, self.data)
-            self.link.execute(self.mysql_create)
-            self.link.execute(self.mysql_grant)
 
             self.con.commit()
             print("User added")
