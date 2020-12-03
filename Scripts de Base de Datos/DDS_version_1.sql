@@ -8,7 +8,8 @@ USE DBA;
 CREATE TABLE Users(
     id INT AUTO_INCREMENT PRIMARY KEY,
     var_user VARCHAR(50) NOT NULL,
-    var_pass VARCHAR(50) NOT NULL
+    var_pass VARCHAR(50) NOT NULL,
+    var_category VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE Draws(
@@ -35,8 +36,10 @@ CREATE TABLE Binnacle(
         ON UPDATE CASCADE
 );
 
-INSERT INTO Users(var_user, var_pass) VALUES(
-    'admin', 'admin'
+DELETE FROM Users WHERE var_user = "admin" and var_pass = "admin" and var_category = "admin";
+
+INSERT INTO Users(var_user, var_pass, var_category) VALUES(
+    'admin', 'admin', 'admin'
 );
 
 -- DELIMITER $$

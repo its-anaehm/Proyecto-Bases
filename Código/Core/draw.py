@@ -165,7 +165,7 @@ class DrawingApplication(tkinter.Frame):
     def __init__(self,master=None):
         super().__init__(master)
         self.pack()
-        self.buildWindow()
+        self.sgbd = None
         self.graphicsCommands = PyList()
 
     # This method is called to create all the widgets, place them in the GUI,column
@@ -492,6 +492,7 @@ class DrawingApplication(tkinter.Frame):
             root = Tk()
             root.title("Add User")
             addUserGUI = AddUserGUI(root)
+            addUserGUI.sgbd = self.sgbd
             root.mainloop()
 
         fileMenu.add_command(command=addUser, label="Add User")

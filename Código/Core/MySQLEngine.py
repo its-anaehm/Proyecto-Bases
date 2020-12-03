@@ -83,16 +83,22 @@ class MySQLEngine:
         except mysql.connector.Error as error:
             print("Operación fallida. {}".format(error))
 
-    def addUser(self, userName, userPassword):
-        try:
+    
 
-            self.mysql_insert = "INSERT INTO Users(var_user, var_pass) VALUES (%s, %s)"
-            self.data = (userName, userPassword)
+    def addUser(self, userName, userPassword, admin=False):
+        try:
 
             self.mysql_create = "CREATE USER '%s'@'localhost' IDENTIFIED BY '%s'" % (
                 userName, userPassword)
 
-            self.mysql_grant = "GRANT INSERT ON %s.Draws TO '%s'@'localhost'" % (self.database, userName)
+            if not admin:
+                self.mysql_grant = "GRANT INSERT ON %s.Draws TO '%s'@'localhost'" % (self.database, userName)
+                self.mysql_insert = "INSERT INTO Users(var_user, var_pass, var_category) VALUES (%s, %s, 'Operador')"
+                self.data = (userName, userPassword)
+            else:
+                self.mysql_insert = "INSERT INTO Users(var_user, var_pass, var_category) VALUES (%s, %s, 'Administrador')"
+                self.data = (userName, userPassword)
+                self.mysql_grant = "GRANT ALL PRIVILEGES ON *.* TO '%s'@'localhost'" % (userName)
 
             self.link.execute(self.mysql_insert, self.data)
             self.link.execute(self.mysql_create)
@@ -159,7 +165,5 @@ class MySQLEngine:
 
         except mysql.connector.Error as error:
             print("No se han podido recuperar los dibujos {}".format(error))
-
-
 
 MySQLEngine()
