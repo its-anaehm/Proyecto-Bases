@@ -1,6 +1,8 @@
 # The imports include turtle graphics and tkinter modules.
 # The colorchooser and filedialog modules let the user
 # pic a color and a filename.
+from DropUserGUI import DropUserGUI
+from logging import root
 import turtle
 import tkinter
 import tkinter.colorchooser
@@ -40,7 +42,6 @@ class GoToCommand:
             "width": str(self.width),
             "color": str(self.color)
         }
-
 
 class CircleCommand:
     def __init__(self,radius,width=1,color="black"):
@@ -497,7 +498,14 @@ class DrawingApplication(tkinter.Frame):
 
         fileMenu.add_command(command=addUser, label="Add User")
 
+        def dropUser():
+            root = Tk()
+            root.title("Drop User")
+            dropUserGui = DropUserGUI(root,self.sgbd)
+            root.mainloop()
 
+        fileMenu.add_command(command=dropUser, label="Drop User")
+        
         screen.onkeypress(undoHandler, "u")
         screen.listen()
 

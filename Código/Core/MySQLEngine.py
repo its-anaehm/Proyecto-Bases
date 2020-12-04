@@ -1,3 +1,4 @@
+
 import mysql.connector
 from mysql.connector import Error
 import configparser
@@ -22,24 +23,6 @@ class MySQLEngine:
         self.server = self.config['DEFAULT']['host']
 
         self.con = None
-
-    """
-    def start(self):
-        self.con = mysql.connector.connect(
-            host = self.server,
-            port = self.port,
-            user = self.user,
-            password = self.password,
-            database = self.database
-
-        )
-
-        # Versión texto de Con
-        print("Versión de texto del objeto de conexión a MySQL: %s" % (self.con))
-
-        #Enlace
-        self.link = self.con.cursor()
-    """
 
     def connectionCheck(self):
         return self.con
@@ -125,7 +108,7 @@ class MySQLEngine:
         except mysql.connector.Error as error:            
             print("Inserción fallida {}".format(error))
 
-    def dropUser(self, userName):
+    def dropUser(self, userName) -> bool:
         try:            
 
             self.mysql_sgbd = "DROP USER '%s'@'localhost'" % (userName)
@@ -137,15 +120,27 @@ class MySQLEngine:
             self.con.commit()
 
             print("User dropped")
+            return True
 
         except mysql.connector.Error as error:
             print("Eliminación fallida {}".format(error))
-    
+            return False
+
+    def retrieveUsers(self):
+        self.mysql_consult = self.select("SELECT var_user FROM Users")
+        self.userArray= []
+
+        for name in self.mysql_result:
+            self.userArray.append(name)
+
+        return self.userArray
     
 
     def alterUser(self, userName, newUserName):
         try:
 
+
+            self.mysql_sgbdUser = "ALTER USER "
             self.mysql_modify = "UPDATE Users SET var_user = %s WHERE var_user = %s"
             self.data = (newUserName, userName)
 
