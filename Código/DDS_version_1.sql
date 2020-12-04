@@ -108,60 +108,55 @@ INSERT INTO Users(var_user, var_pass, var_category) VALUES(
 
 DELIMITER $$
 
-    CREATE TRIGGER bin_addUser BEFORE INSERT ON Users
+    DROP TRIGGER IF EXISTS bin_addUser $$
+    CREATE TRIGGER bin_addUser AFTER INSERT ON Users
         FOR EACH ROW
-        BEGIN
-
-            set @getId = 
-
+        BEGIN            
             INSERT INTO Binnacle(userId, tex_event) VALUES(
-                (SELECT Us.id
+                (SELECT Us.id                    
                     FROM Users Us
                     WHERE ((SUBSTRING_INDEX(CURRENT_USER(), "@",1))) = Us.var_user),
                 "Inserción de Usuario"
-            );
-
+              );
         END $$
 
+    DROP TRIGGER IF EXISTS bin_deleteUser $$ 
     CREATE TRIGGER bin_deleteUser AFTER DELETE ON Users
         FOR EACH ROW
         BEGIN
-
             INSERT INTO Binnacle(userId, tex_event) VALUES(
                 (SELECT Us.id
                     FROM Users Us
                     WHERE ((SUBSTRING_INDEX(CURRENT_USER(), "@",1))) = Us.var_user),
                 "Eliminación de Usuario"
             );
-
         END $$
-
+    
+    DROP TRIGGER IF EXISTS bin_updateUser $$
     CREATE TRIGGER bin_updateUser AFTER UPDATE ON Users
         FOR EACH ROW
         BEGIN
-
             INSERT INTO Binnacle(userId, tex_event) VALUES(
                 (SELECT Us.id
                     FROM Users Us
                     WHERE ((SUBSTRING_INDEX(CURRENT_USER(), "@",1))) = Us.var_user),
                 "Modificación de Usuario"
-            );
-
+                );
         END $$
 
+    DROP TRIGGER IF EXISTS bin_addDraw $$
     CREATE TRIGGER bin_addDraw AFTER INSERT ON Draws
         FOR EACH ROW
         BEGIN
-
             INSERT INTO Binnacle(userId, tex_event) VALUES(
                 (SELECT Us.id
                     FROM Users Us
                     WHERE ((SUBSTRING_INDEX(CURRENT_USER(), "@",1))) = Us.var_user),
                 "Inserción de Dibujo"
-            );
-
+                );
         END $$
     
+    DROP TRIGGER IF EXISTS bin_deleteDraw $$    
     CREATE TRIGGER bin_deleteDraw AFTER DELETE ON Draws
         FOR EACH ROW
         BEGIN
@@ -171,10 +166,11 @@ DELIMITER $$
                     FROM Users Us
                     WHERE ((SUBSTRING_INDEX(CURRENT_USER(), "@",1))) = Us.var_user),
                 "Eliminación de Dibujo"
-            );
-
+                );
         END $$
     
+    DROP TRIGGER IF EXISTS bin_modifyDraw $$
+ 
     CREATE TRIGGER bin_modifyDraw AFTER INSERT ON Draws
         FOR EACH ROW
         BEGIN

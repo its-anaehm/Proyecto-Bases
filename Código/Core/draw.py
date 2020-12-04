@@ -489,11 +489,11 @@ class DrawingApplication(tkinter.Frame):
                 screen.listen()
 
         def addUser():
-            root = Tk()
-            root.title("Add User")
-            addUserGUI = AddUserGUI(root)
+            root2 = Tk()
+            root2.title("Add User")
+            addUserGUI = AddUserGUI(root2)
             addUserGUI.sgbd = self.sgbd
-            root.mainloop()
+            root2.mainloop()
 
         fileMenu.add_command(command=addUser, label="Add User")
 

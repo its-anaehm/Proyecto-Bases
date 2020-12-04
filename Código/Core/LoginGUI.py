@@ -28,8 +28,8 @@ class LoginGUI(ttk.Frame):
         """
         sgbd = MySQLEngine()
         sgbd.authentication(self.name.get(),self.password.get())
-        sgbd.userLoginRegister(self.name.get())
         if(sgbd.connectionCheck()):
+            sgbd.userLoginRegister(self.name.get())
             self.goToDraw(sgbd)
         else:
             print("Nel perro")

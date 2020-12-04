@@ -52,14 +52,17 @@ class MySQLEngine:
                 username=userName,
                 password=password,
                 database=self.database
-
             )
 
             self.link = self.con.cursor()
+            self.user = userName
+            self.password = password
 
-        except mysql.connector.Error as error:
-            self.con = None
-            print("Usuario no válido. {}".format(error))
+        except mysql.connector.Error as err:
+            if err.errno == mysql.connector.errorcode.ER_ACCESS_DENIED_ERROR:
+                print("Datos de usuario erroneos")
+            else:
+                print(err.errno)
     
     def select(self, query):
         self.link.execute(query)
@@ -85,48 +88,60 @@ class MySQLEngine:
 
     
 
-    def addUser(self, userName, userPassword, admin=False):
+    def addUser(self, userName, userPassword, admin):
         try:
 
             self.mysql_create = "CREATE USER '%s'@'localhost' IDENTIFIED BY '%s'" % (
                 userName, userPassword)
             self.link.execute(self.mysql_create)
 
-            if not admin:
-                self.mysql_grant = "GRANT INSERT, SELECT ON %s.Draws TO '%s'@'localhost'" % (self.database, userName)
-                self.mysql_insert = "INSERT INTO Users(var_user, var_pass, var_category) VALUES (%s, %s, 'Operador')"
-                self.data = (userName, userPassword)
-                self.link.execute(self.mysql_insert, self.data)
-                self.link.execute(self.mysql_grant)
-            else:
-                self.mysql_grant = "GRANT ALL PRIVILEGES ON *.* TO '%s'@'localhost'" % (userName)
-                self.mysql_grantOption = "GRANT GRANT OPTION ON %s.* TO '%s'@'localhost'" % (self.database, userName)
+            if admin:
+                print("Usuario admin")
+                self.mysql_grant = "GRANT ALL PRIVILEGES ON *.* TO '%s'@'localhost' WITH GRANT OPTION" % (userName)                
                 self.mysql_insert = "INSERT INTO Users(var_user, var_pass, var_category) VALUES (%s, %s, 'Administrador')"
                 self.data = (userName, userPassword)
-                self.link.execute(self.mysql_grant)
-                self.link.execute(self.mysql_grantOption)
+                self.link.execute(self.mysql_grant)                
                 self.link.execute(self.mysql_insert, self.data)
+                
+
+            else:
+                print("No admin") 
+                self.mysql_grantDraws = "GRANT INSERT, SELECT ON %s.Draws TO '%s'@'localhost'" % (self.database, userName)
+                self.mysql_grantBinnacle = "GRANT INSERT ON %s.Binnacle TO '%s'@'localhost'" % (self.database, userName)
+                self.mysql_grantUsers = "GRANT SELECT ON %s.Users TO '%s'@'localhost'" % (self.database, userName)
+                self.mysql_insert = "INSERT INTO Users(var_user, var_pass, var_category) VALUES (%s, %s, 'Operador')"
+                self.data = (userName, userPassword)
+
+                self.link.execute(self.mysql_insert, self.data)
+                self.link.execute(self.mysql_grantDraws)
+                self.link.execute(self.mysql_grantBinnacle)
+                self.link.execute(self.mysql_grantUsers)
 
 
             self.con.commit()
             print("User added")
+            return True
 
         except mysql.connector.Error as error:            
             print("Inserción fallida {}".format(error))
 
     def dropUser(self, userName):
-        try:
+        try:            
 
+            self.mysql_sgbd = "DROP USER '%s'@'localhost'" % (userName)
             self.mysql_delete = "DELETE FROM Users WHERE var_user = %s"
             self.data = userName
 
             self.link.execute(self.mysql_delete, (self.data,))
+            self.link.execute(self.mysql_sgbd)
             self.con.commit()
 
             print("User dropped")
 
         except mysql.connector.Error as error:
             print("Eliminación fallida {}".format(error))
+    
+    
 
     def alterUser(self, userName, newUserName):
         try:
