@@ -41,12 +41,12 @@ class AddUserGUI(ttk.Frame):
     
     def addUser(self):
         print(self.checkVar.get())
-        """if self.sgbd.addUser(
+        if self.sgbd.addUser(
             self.nameEntryWidget.get(),
             self.passwordEntryWidget.get(),
             True if self.checkVar.get() == 1 else False
         ):
-            self.master.destroy()"""
+            self.master.destroy()
 
 """root = Tk()
 root.title("Add User")
