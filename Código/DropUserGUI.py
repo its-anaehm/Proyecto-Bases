@@ -1,4 +1,5 @@
 from Core.MySQLEngine import MySQLEngine
+from tkinter import messagebox
 from tkinter import ttk
 from tkinter import Tk
 from tkinter import *
@@ -16,7 +17,7 @@ class DropUserGUI(ttk.Frame):
         self.sgbd = sgbd
         self.userList = Listbox(self, selectmode=SINGLE)
         self.makeWidgets()
-        self.pack()
+        self.pack(padx=20, pady=20)
 
     def makeWidgets(self) -> None:
         """
@@ -30,6 +31,9 @@ class DropUserGUI(ttk.Frame):
         ttk.Button(self,text="Drop User", command=self.drop).pack(padx=10, pady=10)
 
     def fillUserList(self):
+        """
+        Llena la lisbox con los nombres de los usuarios
+        """
         users = self.getUsers()
         for index in range(len(users)):
             self.userList.insert(index +1, users[index])
@@ -42,8 +46,9 @@ class DropUserGUI(ttk.Frame):
         if self.sgbd.dropUser(name[0]):
             self.userList.delete(0,'end')
             self.fillUserList()
+            messagebox.showinfo(title="User succesfully deleted", message="%s was deleted" % name[0])
         else:
-            print("Tengo que poner un msgbox")
+            messagebox.showerror(title="Error to drop user",message="Something went wrong to drop the user. Call support")
 
     def getUsers(self):
         """

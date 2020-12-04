@@ -40,12 +40,15 @@ class MySQLEngine:
             self.link = self.con.cursor()
             self.user = userName
             self.password = password
-
+            return (True, "Logged")
         except mysql.connector.Error as err:
             if err.errno == mysql.connector.errorcode.ER_ACCESS_DENIED_ERROR:
-                print("Datos de usuario erroneos")
+                print("Datos erróneos")
+                return (False, "Wrong data")
             else:
+                print("Error de conexión")
                 print(err.errno)
+                return (False, "Error")
     
     def select(self, query):
         self.link.execute(query)

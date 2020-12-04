@@ -1,6 +1,7 @@
 # The imports include turtle graphics and tkinter modules.
 # The colorchooser and filedialog modules let the user
 # pic a color and a filename.
+from Core.MySQLEngine import MySQLEngine
 from DropUserGUI import DropUserGUI
 from logging import root
 import turtle
@@ -166,7 +167,7 @@ class DrawingApplication(tkinter.Frame):
     def __init__(self,master=None):
         super().__init__(master)
         self.pack()
-        self.sgbd = None
+        self.sgbd:MySQLEngine = None
         self.graphicsCommands = PyList()
 
     # This method is called to create all the widgets, place them in the GUI,column
