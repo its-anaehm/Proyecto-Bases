@@ -172,7 +172,7 @@ DELIMITER $$
     
     DROP TRIGGER IF EXISTS bin_modifyDraw $$
  
-    CREATE TRIGGER bin_modifyDraw AFTER INSERT ON Draws
+    CREATE TRIGGER bin_modifyDraw AFTER UPDATE ON Draws
         FOR EACH ROW
         BEGIN
 
@@ -185,26 +185,26 @@ DELIMITER $$
 
         END $$
 
-    DROP PROCEDURE IF EXISTS sp_usersDraws $$
-    CREATE PROCEDURE sp_usersDraws(IN userName VARCHAR(50), OUT result TEXT)
-    BEGIN
-        IF (SELECT var_category FROM Users WHERE var_user = userName) = "Administrador" THEN
-            DROP VIEW IF EXISTS retrieveDraws;
+    -- DROP PROCEDURE IF EXISTS sp_usersDraws $$
+    -- CREATE PROCEDURE sp_usersDraws(IN userName VARCHAR(50), OUT result TEXT)
+    -- BEGIN
+    --     IF (SELECT var_category FROM Users WHERE var_user = userName) = "Administrador" THEN
+    --         DROP VIEW IF EXISTS retrieveDraws;
 
-            CREATE VIEW retrieveDraws AS
-                SELECT var_name, (SELECT Us.var_user FROM Users Us WHERE Us.id = Dr.userId) FROM Draws Dr;
+    --         CREATE VIEW retrieveDraws AS
+    --             SELECT var_name, (SELECT Us.var_user FROM Users Us WHERE Us.id = Dr.userId) FROM Draws Dr;
 
-            result = SELECT * FROM retrieveDraws;
+    --         result = SELECT * FROM retrieveDraws;
 
-        ELSE
-            DROP VIEW IF EXISTS retrieveUserDraws;
+    --     ELSE
+    --         DROP VIEW IF EXISTS retrieveUserDraws;
 
-            CREATE VIEW retrieveUserDraws AS
-                SELECT var_name FROM Draws WHERE var_name = userName;
+    --         CREATE VIEW retrieveUserDraws AS
+    --             SELECT var_name FROM Draws WHERE var_name = userName;
 
-            result = SELECT * FROM retrieveUserDraws;
+    --         result = SELECT * FROM retrieveUserDraws;
             
-    END $$
+    -- END $$
     
 
 DELIMITER ;

@@ -32,7 +32,6 @@ class LoginGUI(ttk.Frame):
         self.sgbd = MySQLEngine()
         userData = self.getUserData()
         response = None
-        print(userData)
 
         if userData:
             response = self.sgbd.authentication(userName=userData["name"], password=userData["password"])
@@ -70,6 +69,6 @@ class LoginGUI(ttk.Frame):
         """
         self.destroy()
         drawing = DrawingApplication(self.master)
-        drawing.sgbd = sgbd
+        drawing.sgbd = sgbd 
         drawing.buildWindow()
 

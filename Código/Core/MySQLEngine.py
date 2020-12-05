@@ -41,17 +41,18 @@ class MySQLEngine:
             self.link = self.con.cursor()
             self.user = userName
             self.password = password
+            self.userData(userName)
             
             return {"status":True, "message":"Logged"}
             
         except mysql.connector.Error as err:
             if err.errno == mysql.connector.errorcode.ER_ACCESS_DENIED_ERROR:
-                print("Datos erróneos" , err.errno)
-                return {"status":False, "message":"Wrong data"}
+                print("Datos erróneos" , err)
+                return {"status":False, "message":"Wrong data", "ErrorData":err.errno}
             else:
                 print("Error de conexión")
-                print(err.errno)
-                return {"status":False, "message":"Error"}
+                print(err)
+                return {"status":False, "message":"Error", "ErrorData":err.errno}
     
     def select(self, query):
         """
@@ -208,21 +209,21 @@ class MySQLEngine:
             return False
 
     def insertDraw(self, drawName, drawConfig):     
-        self.mysql_userId = self.select("SELECT id FROM Users WHERE var_user = '%s'" % (self.user))
-        self.mysql_insert = "INSERT INTO Draws(userId, var_name, jso_drawInfo) VALUES (%s, %s, %s)" % (self.mysql_userId, drawName, drawConfig)
-
+        
+        self.mysql_insert = "INSERT INTO Draws(userId, var_name, jso_drawInfo) VALUES (%s, '%s', '%s')" % (self.mysql_userId, drawName, drawConfig)
         self.link.execute(self.mysql_insert)
         self.con.commit()
+        print("Dibujo insertado")
 
-    def dropDraw(self, userID, drawName):
+    def dropDraw(self, drawName):
         """
         Elimina un dibujo de la base de datos
         :param userID: Ud del usuario dueño del dibujo
         :param drawName: Nombre del dibujo
         """
         try:
-            self.mysql_delete = "DELETE FROM Draws WHERE userId = %d AND var_name = %s"
-            self.data = (userID, drawName)
+            self.mysql_delete = "DELETE FROM Draws WHERE userId = %d AND var_name = '%s'"
+            self.data = (self.mysql_userId, drawName)
 
             self.link.execute(self.mysql_delete, self.data)
             self.con.commit()
@@ -232,29 +233,35 @@ class MySQLEngine:
         except mysql.connector.Error as error:
             print("Borrado de dibujo fallido. {}".format(error))
 
-    def retrieveDraws(self, userName):
+    def retrieveDraws(self):
         """
         Devuelve los registros correspondientes con dibujos
         :param userName: Nombre de usuario dueño de los dibujos.
         """
-        try:
-            self.mysql_drawQuery = "SELECT * FROM Draws WHERE var_name = %s" % (
-                userName)
-
+        try:            
+            print(0)
+            self.mysql_drawQuery = "SELECT id, var_name, DATE(tim_time), TIME(tim_time) FROM Draws WHERE userId = %d" % (self.mysql_userId)
             self.result = self.select(self.mysql_drawQuery)
-            for name, draw in self.result:
-                return ("")
+
+            return self.result
+                
             # Aquí se deben devolver las configuraciones de los dibujos guardados y se deben desplegar en la interfaz.
 
         except mysql.connector.Error as error:
             print("No se han podido recuperar los dibujos {}".format(error))
     
     def userData(self, userName):
-        self.mysql_userId = self.select("SELECT id FROM Users WHERE var_user = %s" , (userName))
+        self.mysql_userId = self.select("SELECT id FROM Users WHERE var_user = '%s'" % (userName))[0][0]
 
-        self.mysql_userCategory = self.select("SELECT var_category FROM Users WHERE var_user = %s" % (userName))
+        self.mysql_userCategory = self.select("SELECT var_category FROM Users WHERE var_user = '%s'" % (userName))[0][0]
 
         return {"id":self.mysql_userId, "category":self.mysql_userCategory}
+
+    def retrieveDrawJSON(self, drawID):
+        self.mysql_drawConfig = "SELECT jso_drawInfo FROM Draws WHERE id = %d" % (drawID)
+
+        self.result = self.select(self.mysql_drawConfig)
+        return self.result[0][0]
 
         
         

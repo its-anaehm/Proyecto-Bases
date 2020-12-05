@@ -1,6 +1,8 @@
 # The imports include turtle graphics and tkinter modules.
 # The colorchooser and filedialog modules let the user
 # pic a color and a filename.
+from Core.ChooseDraw import ChooseDraw
+import tkinter.simpledialog as simpleDialog
 from Core.AlterUserGUI import ChoseUserToAlterGUI
 from Core.MySQLEngine import MySQLEngine
 from DropUserGUI import DropUserGUI
@@ -12,6 +14,7 @@ import tkinter.filedialog
 import json
 from .AddUserGUI import AddUserGUI
 from tkinter import Tk
+import os
 
 # The following classes define the different commands that
 # are supported by the drawing application.
@@ -171,6 +174,7 @@ class DrawingApplication(tkinter.Frame):
         self.sgbd:MySQLEngine = None
         self.graphicsCommands = PyList()
 
+
     # This method is called to create all the widgets, place them in the GUI,column
     # and define the event handlers for the application.
     def buildWindow(self):
@@ -206,8 +210,8 @@ class DrawingApplication(tkinter.Frame):
         fileMenu.add_command(label="New",command=newWindow)
 
         # The parse function adds the contents of an XML file to the sequence
-        def parse(filename):
-            JSONData = json.load(open(filename))
+        def parse(JSONString):
+            JSONData = json.load(JSONString)
 
             graphicsCommands = JSONData["Draw"]
 
@@ -248,10 +252,20 @@ class DrawingApplication(tkinter.Frame):
 
         def loadFile():
 
-            filename = tkinter.filedialog.askopenfilename(title="Select a Graphics File")
-                
-            newWindow()
+            #filename = tkinter.filedialog.askopenfilename(title="Select a Graphics File")
+            self.destroy()
 
+            root = Tk()
+            chooseDraw = ChooseDraw(root,self.sgbd)
+            root.mainloop()
+
+            print("Despues del main loop")
+
+            filename = chooseDraw.itemID
+            print(filename)
+
+            root.destroy()
+            newWindow()
             # This re-initializes the sequence for the new picture.
             self.graphicsCommands = PyList()
 
@@ -291,7 +305,7 @@ class DrawingApplication(tkinter.Frame):
 
             return "".join(result)
 
-        def write(filename, formated=True, tab=1):
+        def write(filename, formated=False, tab=1):
             file = open(filename,"w")
             if (formated):
                 file.write('{\n%s"Draw":[\n' % ("\t"*tab))
@@ -308,9 +322,12 @@ class DrawingApplication(tkinter.Frame):
             file.close()
 
         def saveFile():
-            filename = tkinter.filedialog.asksaveasfilename(title="Save Picture As...")
-            write('%s.json' % (filename))
-            self.sgbd.insertDraw(drawName=filename, drawConfig=drawToJSON())
+            #filename = tkinter.filedialog.asksaveasfilename(title="Save Picture As...")
+            filename = simpleDialog.askstring("Save draw","Write the name of the draw.")
+            #self.sgbd.insertDraw(drawName=filename, drawConfig=drawToJSON())
+            fileAbsPath = os.path.join(os.path.abspath("."),"%s.json" % filename)
+            print(fileAbsPath)
+            write(fileAbsPath)
         
         fileMenu.add_command(label="Save Ass...",command=saveFile)
 
