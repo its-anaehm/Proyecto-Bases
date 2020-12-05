@@ -211,7 +211,7 @@ class DrawingApplication(tkinter.Frame):
 
         # The parse function adds the contents of an XML file to the sequence
         def parse(JSONString):
-            JSONData = json.load(JSONString)
+            JSONData = json.loads(JSONString)
 
             graphicsCommands = JSONData["Draw"]
 
@@ -253,7 +253,7 @@ class DrawingApplication(tkinter.Frame):
         def loadFile():
 
             #filename = tkinter.filedialog.askopenfilename(title="Select a Graphics File")
-            self.destroy()
+            #self.destroy()
 
             root = Tk()
             chooseDraw = ChooseDraw(root,self.sgbd)
@@ -262,7 +262,6 @@ class DrawingApplication(tkinter.Frame):
             print("Despues del main loop")
 
             filename = chooseDraw.itemID
-            print(filename)
 
             root.destroy()
             newWindow()
@@ -270,14 +269,14 @@ class DrawingApplication(tkinter.Frame):
             self.graphicsCommands = PyList()
 
             # calling parse will read the graphics commands from the file.
-            parse(filename)
+            parse(chooseDraw.itemJSON)
 
             for cmd in self.graphicsCommands:
                     cmd.draw(theTurtle)
                 
             # This line is necessary to update the window after the picture is drawn.
             screen.update()
-
+            
 
         fileMenu.add_command(label="Load...",command=loadFile)
         """
@@ -324,7 +323,7 @@ class DrawingApplication(tkinter.Frame):
         def saveFile():
             #filename = tkinter.filedialog.asksaveasfilename(title="Save Picture As...")
             filename = simpleDialog.askstring("Save draw","Write the name of the draw.")
-            #self.sgbd.insertDraw(drawName=filename, drawConfig=drawToJSON())
+            self.sgbd.insertDraw(drawName=filename, drawConfig=drawToJSON())
             fileAbsPath = os.path.join(os.path.abspath("."),"%s.json" % filename)
             print(fileAbsPath)
             write(fileAbsPath)

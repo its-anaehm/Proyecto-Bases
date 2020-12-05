@@ -239,7 +239,6 @@ class MySQLEngine:
         :param userName: Nombre de usuario dueño de los dibujos.
         """
         try:            
-            print(0)
             self.mysql_drawQuery = "SELECT id, var_name, DATE(tim_time), TIME(tim_time) FROM Draws WHERE userId = %d" % (self.mysql_userId)
             self.result = self.select(self.mysql_drawQuery)
 

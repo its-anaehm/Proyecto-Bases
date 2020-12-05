@@ -30,10 +30,11 @@ class ChooseDraw(ttk.Frame):
         ttk.Button(self,text="Choose Draw",command=self.getSelected).pack()
     
     def fillTreeView(self):
-        print(self.sgbd.retrieveDraws())
         for draw in self.sgbd.retrieveDraws():
             self.treeView.insert('','end',values=draw)
 
     def getSelected(self):
         self.itemID = self.treeView.item(self.treeView.selection()[0])["values"][0]
+        self.itemName = self.treeView.item(self.treeView.selection()[0])["values"][1]
+        self.itemJSON = self.sgbd.retrieveDrawJSON(self.itemID)
         self.master.quit()
