@@ -1,6 +1,8 @@
 # The imports include turtle graphics and tkinter modules.
 # The colorchooser and filedialog modules let the user
 # pic a color and a filename.
+from tkinter import messagebox
+from tkinter.constants import COMMAND
 from Core.ChooseDraw import ChooseDraw
 import tkinter.simpledialog as simpleDialog
 from Core.AlterUserGUI import ChoseUserToAlterGUI
@@ -261,7 +263,6 @@ class DrawingApplication(tkinter.Frame):
 
             print("Despues del main loop")
 
-            filename = chooseDraw.itemID
 
             root.destroy()
             newWindow()
@@ -323,10 +324,16 @@ class DrawingApplication(tkinter.Frame):
         def saveFile():
             #filename = tkinter.filedialog.asksaveasfilename(title="Save Picture As...")
             filename = simpleDialog.askstring("Save draw","Write the name of the draw.")
-            self.sgbd.insertDraw(drawName=filename, drawConfig=drawToJSON())
-            fileAbsPath = os.path.join(os.path.abspath("."),"%s.json" % filename)
-            print(fileAbsPath)
-            write(fileAbsPath)
+            if filename:
+                result = self.sgbd.insertDraw(drawName=filename, drawConfig=drawToJSON())
+                if result["status"]:
+                    fileAbsPath = os.path.join(os.path.abspath("."),"%s.json" % filename)
+                    print(fileAbsPath)
+                    write(fileAbsPath)
+                else:
+                    question = messagebox.askyesno(title="Save Draw", message="Draw %s already exists, do you want overwrite it?." % filename)
+                    if question:
+                        self.sgbd.modifyDraw(result["drawId"], drawToJSON())
         
         fileMenu.add_command(label="Save Ass...",command=saveFile)
 
@@ -546,6 +553,16 @@ class DrawingApplication(tkinter.Frame):
             root.mainloop()
 
         fileMenu.add_command(command=alterUser, label="Alter User")
+
+        def dropDraw():
+            root = Tk()
+            root.title("Delete a draw")
+            chooseDraw = ChooseDraw(root,self.sgbd)
+            root.mainloop()
+            root.destroy()
+            self.sgbd.dropDraw(chooseDraw.itemID)
+
+        fileMenu.add_command(command=dropDraw, label="Drop draw")
         
         screen.onkeypress(undoHandler, "u")
         screen.listen()

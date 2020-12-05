@@ -209,29 +209,44 @@ class MySQLEngine:
             return False
 
     def insertDraw(self, drawName, drawConfig):     
+        self.mysql_nameExists = self.select(("SELECT id FROM Draws WHERE var_name = '%s' and userId = %d") % (drawName, self.mysql_userId))
         
-        self.mysql_insert = "INSERT INTO Draws(userId, var_name, jso_drawInfo) VALUES (%s, '%s', '%s')" % (self.mysql_userId, drawName, drawConfig)
-        self.link.execute(self.mysql_insert)
-        self.con.commit()
-        print("Dibujo insertado")
+        if self.mysql_nameExists:
+            return {"status":False, "message":"Draw already exist.", "drawId":self.mysql_nameExists[0][0]}
 
-    def dropDraw(self, drawName):
+        else:
+            self.mysql_insert = "INSERT INTO Draws(userId, var_name, jso_drawInfo) VALUES (%s, '%s', '%s')" % (self.mysql_userId, drawName, drawConfig)
+            self.link.execute(self.mysql_insert)
+            self.con.commit()
+            print("Dibujo insertado")
+            return {"status":True, "message":"Draw inserted"}
+
+    def dropDraw(self, drawId):
         """
         Elimina un dibujo de la base de datos
         :param userID: Ud del usuario dueño del dibujo
         :param drawName: Nombre del dibujo
         """
         try:
-            self.mysql_delete = "DELETE FROM Draws WHERE userId = %d AND var_name = '%s'"
-            self.data = (self.mysql_userId, drawName)
+            self.mysql_delete = "DELETE FROM Draws WHERE id = %d" % (drawId)
 
-            self.link.execute(self.mysql_delete, self.data)
+            self.link.execute(self.mysql_delete)
             self.con.commit()
 
             print("Dibujo Eliminado.")
 
         except mysql.connector.Error as error:
             print("Borrado de dibujo fallido. {}".format(error))
+
+    def modifyDraw(self, drawId, drawJson):
+        try:
+            self.mysql_drawUpdate = "UPDATE Draws SET jso_drawInfo = '%s' WHERE id = %d" % (drawJson, drawId)
+
+            self.link.execute(self.mysql_drawUpdate)
+            self.con.commit()
+        except mysql.connector.Error as error:
+            print("Dibujo no se pudo modificar. {}".format(error))
+
 
     def retrieveDraws(self):
         """
