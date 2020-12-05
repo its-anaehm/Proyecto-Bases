@@ -1,6 +1,7 @@
 # The imports include turtle graphics and tkinter modules.
 # The colorchooser and filedialog modules let the user
 # pic a color and a filename.
+from Core.AlterUserGUI import ChoseUserToAlterGUI
 from Core.MySQLEngine import MySQLEngine
 from DropUserGUI import DropUserGUI
 from logging import root
@@ -278,6 +279,18 @@ class DrawingApplication(tkinter.Frame):
 
             file.close()
         """
+
+        def drawToJSON():
+            result = []
+            result.append('{"Draw":[')
+
+            for cmd in self.graphicsCommands:
+                result.append("%s%s" %(str(cmd),","))
+            result.append('{"command":"end"}')
+            result.append("]}")
+
+            return "".join(result)
+
         def write(filename, formated=True, tab=1):
             file = open(filename,"w")
             if (formated):
@@ -297,8 +310,9 @@ class DrawingApplication(tkinter.Frame):
         def saveFile():
             filename = tkinter.filedialog.asksaveasfilename(title="Save Picture As...")
             write('%s.json' % (filename))
+            self.sgbd.insertDraw(drawName=filename, drawConfig=drawToJSON())
         
-        fileMenu.add_command(label="Save As...",command=saveFile)
+        fileMenu.add_command(label="Save Ass...",command=saveFile)
 
 
         fileMenu.add_command(label="Exit",command=self.master.quit)
@@ -505,7 +519,17 @@ class DrawingApplication(tkinter.Frame):
             dropUserGui = DropUserGUI(root,self.sgbd)
             root.mainloop()
 
+
         fileMenu.add_command(command=dropUser, label="Drop User")
+        
+
+        def alterUser():
+            root = Tk()
+            root.title("Change user values")
+            ChoseUserToAlterGUI(root, self.sgbd)
+            root.mainloop()
+
+        fileMenu.add_command(command=alterUser, label="Alter User")
         
         screen.onkeypress(undoHandler, "u")
         screen.listen()

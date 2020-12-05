@@ -35,8 +35,9 @@ class DropUserGUI(ttk.Frame):
         Llena la lisbox con los nombres de los usuarios
         """
         users = self.getUsers()
-        for index in range(len(users)):
-            self.userList.insert(index +1, users[index])
+        if users:
+            for index in range(len(users)):
+                self.userList.insert(index +1, users[index])
 
     def drop(self) -> None:
         """

@@ -16,6 +16,7 @@ CREATE TABLE Draws(
     id INT AUTO_INCREMENT PRIMARY KEY,
     userId INT NOT NULL,
     var_name VARCHAR(50) NOT NULL,
+    tim_time TIMESTAMP DEFAULT NOW(),
     jso_drawInfo JSON NOT NULL,
 
     FOREIGN KEY (userId)
@@ -36,7 +37,7 @@ CREATE TABLE Binnacle(
         ON UPDATE CASCADE
 );
 
-DELETE FROM Users WHERE var_user = "admin" and var_pass = "admin" and var_category = "admin";
+DELETE FROM Users WHERE var_user = "admin" and var_pass = "admin" and var_category = "Administrador";
 
 INSERT INTO Users(var_user, var_pass, var_category) VALUES(
     ((SUBSTRING_INDEX(CURRENT_USER(), "@",1))), 'admin', 'admin'
@@ -183,6 +184,27 @@ DELIMITER $$
             );
 
         END $$
+
+    DROP PROCEDURE IF EXISTS sp_usersDraws $$
+    CREATE PROCEDURE sp_usersDraws(IN userName VARCHAR(50), OUT result TEXT)
+    BEGIN
+        IF (SELECT var_category FROM Users WHERE var_user = userName) = "Administrador" THEN
+            DROP VIEW IF EXISTS retrieveDraws;
+
+            CREATE VIEW retrieveDraws AS
+                SELECT var_name, (SELECT Us.var_user FROM Users Us WHERE Us.id = Dr.userId) FROM Draws Dr;
+
+            result = SELECT * FROM retrieveDraws;
+
+        ELSE
+            DROP VIEW IF EXISTS retrieveUserDraws;
+
+            CREATE VIEW retrieveUserDraws AS
+                SELECT var_name FROM Draws WHERE var_name = userName;
+
+            result = SELECT * FROM retrieveUserDraws;
+            
+    END $$
     
 
 DELIMITER ;

@@ -28,20 +28,11 @@ class LoginGUI(ttk.Frame):
         ttk.Button(self,text="Login", style='W.TButton', command=self.verify).pack(pady=15)
 
     def verify(self):
-        """
-        Verifica si el usuario está correctamente registrado
-        
-        sgbd = MySQLEngine()
-        sgbd.authentication(self.name.get(),self.password.get())
-        if(sgbd.connectionCheck()):
-            sgbd.userLoginRegister(self.name.get())
-            self.goToDraw(sgbd)
-        else:
-            print("Nel perro")
-        """
+
         self.sgbd = MySQLEngine()
         userData = self.getUserData()
         response = None
+        print(userData)
 
         if userData:
             response = self.sgbd.authentication(userName=userData["name"], password=userData["password"])
@@ -49,10 +40,13 @@ class LoginGUI(ttk.Frame):
             messagebox.showwarning(title="Wrong data",message="You should write you User name and you password.")
             return False
         
-        if response[0]:
+
+        print(response)
+
+        if response["status"]:
             self.goToDraw(self.sgbd)
         
-        elif response[1] == "Wrong data":
+        elif response["message"] == "Wrong data":
             messagebox.showerror(title="Login Error",message="Wrong user data")
         
         else:
