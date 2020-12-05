@@ -25,6 +25,13 @@ CREATE TABLE Draws(
         ON UPDATE CASCADE
 );
 
+CREATE TABLE drawsConfig(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    flo_pennColor VARCHAR(50) NOT NULL,
+    flo_fillColor VARCHAR(50) NOT NULL
+);
+
+
 CREATE TABLE Binnacle(
     id INT AUTO_INCREMENT PRIMARY KEY,
     userId INT NOT NULL,
@@ -42,6 +49,9 @@ DELETE FROM Users WHERE var_user = "admin" and var_pass = "admin" and var_catego
 INSERT INTO Users(var_user, var_pass, var_category) VALUES(
     ((SUBSTRING_INDEX(CURRENT_USER(), "@",1))), 'admin', 'admin'
 );
+
+CREATE USER IF NOT EXISTS 'admin'@'localhost' IDENTIFIED BY 'admin';
+GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost' WITH GRANT OPTION;
 
 -- DELIMITER $$
 
