@@ -26,8 +26,8 @@ CREATE TABLE Draws(
 );
 
 CREATE TABLE drawsConfig(    
-    var_penColor VARCHAR(50) NOT NULL DEFAULT "",
-    var_fillColor VARCHAR(50) NOT NULL DEFAULT ""
+    var_penColor VARCHAR(50) NOT NULL DEFAULT "#000000",
+    var_fillColor VARCHAR(50) NOT NULL DEFAULT "#000000"
 );
 
 CREATE TABLE Binnacle(
@@ -42,14 +42,7 @@ CREATE TABLE Binnacle(
         ON UPDATE CASCADE
 );
 
-DELETE FROM Users WHERE var_user = "admin" and var_pass = "admin" and var_category = "Administrador";
-
-INSERT INTO Users(var_user, var_pass, var_category) VALUES(
-    ((SUBSTRING_INDEX(CURRENT_USER(), "@",1))), 'admin', 'admin'
-);
-
-CREATE USER IF NOT EXISTS 'admin'@'localhost' IDENTIFIED BY 'admin';
-GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost' WITH GRANT OPTION;
+-- DELETE FROM Users WHERE var_user = "admin" and var_pass = "admin" and var_category = "Administrador";
 
 -- DELIMITER $$
 
@@ -189,6 +182,19 @@ DELIMITER $$
                     FROM Users Us
                     WHERE ((SUBSTRING_INDEX(CURRENT_USER(), "@",1))) = Us.var_user),
                 "Modificación de Dibujo"
+            );
+
+        END $$
+
+    CREATE TRIGGER bin_modifyDrawConfig AFTER UPDATE ON drawsConfig
+        FOR EACH ROW
+        BEGIN
+
+            INSERT INTO Binnacle(userId, tex_event) VALUES(
+                (SELECT Us.id
+                    FROM Users Us
+                    WHERE ((SUBSTRING_INDEX(CURRENT_USER(), "@",1))) = Us.var_user),
+                "Modificación de Configuración de Colores de Dibujo"
             );
 
         END $$
