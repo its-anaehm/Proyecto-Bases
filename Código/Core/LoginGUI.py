@@ -1,5 +1,5 @@
 from re import template
-from tkinter import ttk
+from tkinter import PhotoImage, Tk, ttk
 from .draw import DrawingApplication
 from .MySQLEngine import MySQLEngine
 from tkinter import messagebox
@@ -8,10 +8,19 @@ class LoginGUI(ttk.Frame):
     """
     Frame que representa el login de la aplicación
     """
-    def __init__(self, parent):
+    def __init__(self, parent=None):
+        if not parent:
+            parent = Tk()
+            parent.title("Picasso")
+            parent.resizable(0,0)
+            logo = PhotoImage(file="Core/LogoProyecto.png")
+            parent.iconphoto(False,logo)
+
+
         super().__init__(parent)
         self.pack()
         self.makeForm()
+        self.master.mainloop()
 
     def makeForm(self):
         """
@@ -26,6 +35,7 @@ class LoginGUI(ttk.Frame):
         self.password.pack()
         ttk.Label(self,text="Password",font=dataLabelFont).pack()
         ttk.Button(self,text="Login", style='W.TButton', command=self.verify).pack(pady=15)
+
 
     def verify(self):
 

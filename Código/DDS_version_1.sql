@@ -25,12 +25,10 @@ CREATE TABLE Draws(
         ON UPDATE CASCADE
 );
 
-CREATE TABLE drawsConfig(
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    flo_pennColor VARCHAR(50) NOT NULL,
-    flo_fillColor VARCHAR(50) NOT NULL
+CREATE TABLE drawsConfig(    
+    var_penColor VARCHAR(50) NOT NULL DEFAULT "",
+    var_fillColor VARCHAR(50) NOT NULL DEFAULT ""
 );
-
 
 CREATE TABLE Binnacle(
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -195,32 +193,24 @@ DELIMITER $$
 
         END $$
 
-    -- DROP PROCEDURE IF EXISTS sp_usersDraws $$
-    -- CREATE PROCEDURE sp_usersDraws(IN userName VARCHAR(50), OUT result TEXT)
-    -- BEGIN
-    --     IF (SELECT var_category FROM Users WHERE var_user = userName) = "Administrador" THEN
-    --         DROP VIEW IF EXISTS retrieveDraws;
+    DROP PROCEDURE IF EXISTS sp_addMainUser $$
+    CREATE PROCEDURE sp_addMainUser(IN category VARCHAR(50))
+        BEGIN
 
-    --         CREATE VIEW retrieveDraws AS
-    --             SELECT var_name, (SELECT Us.var_user FROM Users Us WHERE Us.id = Dr.userId) FROM Draws Dr;
-
-    --         result = SELECT * FROM retrieveDraws;
-
-    --     ELSE
-    --         DROP VIEW IF EXISTS retrieveUserDraws;
-
-    --         CREATE VIEW retrieveUserDraws AS
-    --             SELECT var_name FROM Draws WHERE var_name = userName;
-
-    --         result = SELECT * FROM retrieveUserDraws;
+            INSERT INTO Users(var_user, var_pass, var_category) VALUES(((SUBSTRING_INDEX(CURRENT_USER(), "@",1))), 'admin', category);
             
-    -- END $$
-    
+            CREATE USER IF NOT EXISTS 'admin'@'localhost' IDENTIFIED BY 'admin';
+            GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost' WITH GRANT OPTION;
+        
+        END $$
 
 DELIMITER ;
 
-
 SELECT * FROM Users;
+
+CALL sp_addMainUser("Administrador");
+
+INSERT INTO drawsConfig() VALUES ();
 
 SELECT user FROM mysql.user;
 

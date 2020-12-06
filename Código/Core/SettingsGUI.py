@@ -1,6 +1,7 @@
 from Core.DropUserGUI import DropUserGUI
 from Core.AddUserGUI import AddUserGUI
 from Core.AlterUserGUI import ChoseUserToAlterGUI
+from Core.MySQLEngine import *
 
 import tkinter
 from tkinter import *
@@ -50,9 +51,21 @@ class SettingsGUI(ttk.Frame):
         color = tkinter.colorchooser.askcolor()
         if color[0] != None:
             hexaColor = color[1]
+            try:
+                self.mysql_sendPenColor = "UPDATE drawsConfig SET var_penColor = '%s'" % (hexaColor)
+                self.sgbd.link.execute(self.mysql_sendPenColor)
+                self.sgbd.con.commit()
+            except mysql.connector.Error as error:
+                print("La configuración no pudo aplicarse, {}".format(error))
 
     def changeFillColor(self):
         color = tkinter.colorchooser.askcolor()
         if color[0] != None:
             hexaColor = color[1]
+            try:
+                self.mysql_sendFillColor = "UPDATE drawsConfig SET var_fillColor = '%s'" % (hexaColor)
+                self.sgbd.link.execute(self.mysql_sendFillColor)
+                self.sgbd.con.commit()
+            except mysql.connector.Error as error:
+                print("La configuración no pudo aplicarse, {}".format(error))
 

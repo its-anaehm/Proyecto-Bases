@@ -277,6 +277,15 @@ class MySQLEngine:
         self.result = self.select(self.mysql_drawConfig)
         return self.result[0][0]
 
+    def retrieveBinnacleInfo(self):
+        try:
+            self.mysql_binnacle = self.select("SELECT tex_event, DATE(tim_time), TIME(tim_time) FROM Binnacle")
+
+            return self.mysql_binnacle[0][0]
+
+        except mysql.connector.Error as error:
+            print("No se puedieron recuperar los registros de bitácora. {}").format(error)
+
         
         
 
