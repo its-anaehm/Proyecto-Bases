@@ -23,7 +23,7 @@ class DropUserGUI(ttk.Frame):
         """
         Crea y empaqueta los elementos en la ventana.
         """
-        ttk.Label(self,text="Drop User", font=('Times', '30', 'normal')).pack()
+        ttk.Label(self,text="Drop User", font=('Kollektif', '30', 'normal')).pack()
 
         self.fillUserList()
         

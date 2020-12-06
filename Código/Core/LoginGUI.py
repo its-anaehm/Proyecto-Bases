@@ -17,8 +17,8 @@ class LoginGUI(ttk.Frame):
         """
         Crea los widgets en el marco.
         """
-        dataLabelFont = ('Times','20','normal')
-        ttk.Label(self,text="Picasso",font=('Times', '60', 'italic'), padding="50").pack()
+        dataLabelFont = ('Kollektif','20','normal')
+        ttk.Label(self,text="Picasso",font=('Kollektif', '60', 'italic'), padding="50").pack()
         self.name = ttk.Entry(self)
         self.name.pack()
         ttk.Label(self,text="User Name",font=dataLabelFont).pack()

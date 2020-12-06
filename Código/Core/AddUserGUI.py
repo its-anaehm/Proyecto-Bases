@@ -12,7 +12,7 @@ class AddUserGUI(ttk.Frame):
 
     def __init__(self, parent):
         super().__init__(parent)
-        self.dataLabelFont = ('Times', '20', 'normal')
+        self.dataLabelFont = ('Kollektif', '20', 'normal')
         self.pack(pady=20, padx=20)
         self.sgbd: MySQLEngine= None
         self.checkVar = BooleanVar()
@@ -50,7 +50,7 @@ class AddUserGUI(ttk.Frame):
         """
         Empaqueta los widgets en la ventana
         """
-        ttk.Label(self, text="Add User", font=('Times', '40', 'normal')).pack()
+        ttk.Label(self, text="Add User", font=('Kollektif', '40', 'normal')).pack()
 
         self.nameEntryWidget = ttk.Entry(self)
         self.nameEntryWidget.pack()

@@ -16,7 +16,7 @@ class ChooseDraw(ttk.Frame):
         if function:
             self.master.title(function)
 
-        ttk.Label(self,text="Choose a draw", font=('Times', '30', 'normal')).pack()
+        ttk.Label(self,text="Choose a draw", font=('Kollektif', '30', 'normal')).pack()
 
         self.treeView = ttk.Treeview(self,columns=(0,1,2,3), show="headings", height="5")
         self.treeView.heading(0, text="Id")

@@ -1,13 +1,14 @@
 # The imports include turtle graphics and tkinter modules.
 # The colorchooser and filedialog modules let the user
 # pic a color and a filename.
+from Core.SettingsGUI import SettingsGUI
 from tkinter import messagebox
 from tkinter.constants import COMMAND
 from Core.ChooseDraw import ChooseDraw
 import tkinter.simpledialog as simpleDialog
 from Core.AlterUserGUI import ChoseUserToAlterGUI
 from Core.MySQLEngine import MySQLEngine
-from DropUserGUI import DropUserGUI
+from Core.DropUserGUI import DropUserGUI
 from logging import root
 import turtle
 import tkinter
@@ -338,7 +339,6 @@ class DrawingApplication(tkinter.Frame):
         fileMenu.add_command(label="Save Ass...",command=saveFile)
 
 
-        fileMenu.add_command(label="Exit",command=self.master.quit)
 
         bar.add_cascade(label="File",menu=fileMenu)
 
@@ -526,33 +526,7 @@ class DrawingApplication(tkinter.Frame):
                     cmd.draw(theTurtle)
                 screen.update()
                 screen.listen()
-
-        def addUser():
-            root2 = Tk()
-            root2.title("Add User")
-            addUserGUI = AddUserGUI(root2)
-            addUserGUI.sgbd = self.sgbd
-            root2.mainloop()
-
-        fileMenu.add_command(command=addUser, label="Add User")
-
-        def dropUser():
-            root = Tk()
-            root.title("Drop User")
-            dropUserGui = DropUserGUI(root,self.sgbd)
-            root.mainloop()
-
-
-        fileMenu.add_command(command=dropUser, label="Drop User")
         
-
-        def alterUser():
-            root = Tk()
-            root.title("Change user values")
-            ChoseUserToAlterGUI(root, self.sgbd)
-            root.mainloop()
-
-        fileMenu.add_command(command=alterUser, label="Alter User")
 
         def dropDraw():
             root = Tk()
@@ -563,7 +537,19 @@ class DrawingApplication(tkinter.Frame):
             self.sgbd.dropDraw(chooseDraw.itemID)
 
         fileMenu.add_command(command=dropDraw, label="Drop draw")
-        
+
+        def settings():
+            root = Tk()
+            settings = SettingsGUI(root,self.sgbd)
+            root.title("Settings")
+            root.mainloop()
+
+
+        fileMenu.add_command(label="Settings", command=settings)
+
+
+        fileMenu.add_command(label="Exit",command=self.master.quit)
+
         screen.onkeypress(undoHandler, "u")
         screen.listen()
 

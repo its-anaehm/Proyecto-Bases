@@ -22,7 +22,7 @@ class LoadDrawGUI(ttk.Frame):
     def makeWidgets(self,data):
         self.data = data
 
-        ttk.Label(self,text="Choose a draw", font=('Times', '30', 'normal')).pack()
+        ttk.Label(self,text="Choose a draw", font=('Kollektif', '30', 'normal')).pack()
         self.listDraw = Listbox(self)
 
         num = 1

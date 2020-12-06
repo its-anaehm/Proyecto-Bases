@@ -19,7 +19,7 @@ class ChoseUserToAlterGUI(ttk.Frame):
         self.master.title("Alter user")
         self.sgbd:MySQLEngine = sgbd
 
-        ttk.Label(self,text="Chose an User", font=('Times', '30', 'normal')).pack()
+        ttk.Label(self,text="Chose an User", font=('Kollektif', '30', 'normal')).pack()
 
         self.userList = Listbox(self, selectmode=SINGLE)
         self.users = []
@@ -60,7 +60,7 @@ class ChangeUserData(ttk.Frame):
         self.usersList = usersList
 
         self.pack(padx=20, pady=20)
-        ttk.Label(self,text="Change de values of the user %s" % self.userName, font=('Times', '30', 'normal')).pack()
+        ttk.Label(self,text="Change de values of the user %s" % self.userName, font=('Kollektif', '30', 'normal')).pack()
         
         ttk.Button(self,text="Change name", command=self.changeName).pack()
         ttk.Button(self,text="Change Password", command=self.changePassword).pack()
@@ -73,8 +73,10 @@ class ChangeUserData(ttk.Frame):
             showwarning(title="Error user name", message="The user %s already exist" % newName)
         elif newName:
             self.sgbd.alterUser(userName=self.userName, newUserName=newName)
+            self.master.destroy()
 
     def changePassword(self):
         newPassword = simpleDialog.askstring("New password", "Write new password for %s" % self.userName)
         if newPassword:
             self.sgbd.alterUser(userName=self.userName, password=newPassword)
+            self.master.destroy()
