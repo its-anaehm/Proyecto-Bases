@@ -1,5 +1,4 @@
 
-from turtle import write
 import mysql.connector
 from mysql.connector import Error
 import configparser
@@ -13,11 +12,11 @@ import configparser
 
 class MySQLEngine:
 
-    def __init__(self, configFile = "./Core/conectionConfig.ini"):
+    def __init__(self):
 
         # Reading data from config file
         self.config = configparser.ConfigParser()
-        self.config.read(configFile)
+        self.config.read("./Core/conectionConfig.ini")
         self.config.sections()
         self.port = self.config['DEFAULT']['port']
         self.database = self.config['DEFAULT']['database']
@@ -42,7 +41,7 @@ class MySQLEngine:
             self.link = self.con.cursor()
             self.user = userName
             self.password = password
-            self.userData()
+            self.userData(userName)
             
             return {"status":True, "message":"Logged"}
             
@@ -110,13 +109,8 @@ class MySQLEngine:
 
             if admin:
                 #Asignación de permisos a usuarios administradores
-                self.mysql_grant = "GRANT ALL PRIVILEGES ON *.* TO '%s'@'%s' WITH GRANT OPTION" % (userName, self.server)
-
-                # Reemplazar esta línea por proceso almacenado             
-                #self.mysql_insert = "INSERT INTO Users(var_user, var_pass, var_category) VALUES (%s, %s, 'Administrador')"
-                self.mysql_insert = "INSERT INTO Users(var_user, var_pass, var_category) VALUES (ft_encrypt(%s), ft_encrypt(%s), ft_encrypt('Administrador'))"
-                
-
+                self.mysql_grant = "GRANT ALL PRIVILEGES ON *.* TO '%s'@'%s' WITH GRANT OPTION" % (userName, self.server)                
+                self.mysql_insert = "INSERT INTO Users(var_user, var_pass, var_category) VALUES (%s, %s, 'Administrador')"
                 self.data = (userName, userPassword)
                 self.link.execute(self.mysql_grant)                
                 self.link.execute(self.mysql_insert, self.data)
@@ -127,13 +121,10 @@ class MySQLEngine:
                 self.mysql_grantDraws = "GRANT INSERT, SELECT ON %s.Draws TO '%s'@'%s'" % (self.database, userName, self.server)
                 self.mysql_grantBinnacle = "GRANT INSERT ON %s.Binnacle TO '%s'@'%s'" % (self.database, userName, self.server)
                 self.mysql_grantUsers = "GRANT SELECT ON %s.Users TO '%s'@'%s'" % (self.database, userName, self.server)
+                self.mysql_insert = "INSERT INTO Users(var_user, var_pass, var_category) VALUES (%s, %s, 'Operador')"
+                self.data = (userName, userPassword)
 
-                # Reemplazar esta línea por proceso almacenado
-                #self.mysql_insert = "INSERT INTO Users(var_user, var_pass, var_category) VALUES (%s, %s, 'Operador')" 
-                self.mysql_insert = "INSERT INTO Users(var_user, var_pass, var_category) VALUES (ft_encrypt(%s), ft_encrypt(%s), ft_encrypt('Operador'))" % (userName, userPassword)
-                
-
-                self.link.execute(self.mysql_insert)
+                self.link.execute(self.mysql_insert, self.data)
                 self.link.execute(self.mysql_grantDraws)
                 self.link.execute(self.mysql_grantBinnacle)
                 self.link.execute(self.mysql_grantUsers)
@@ -145,14 +136,6 @@ class MySQLEngine:
         except mysql.connector.Error as error:            
             print("Inserción fallida {}".format(error.errno))
 
-    def encrypt(self, data):
-        self.mysql_pass = self.select("SELECT var_pass FROM User WHERE var_user = 'admin'")
-        self.mysql_encryption = "SELECT AES_ENCRYPT('%s', '%s')" % (data, self.mysql_pass[0][0])
-
-    def decrypt(self,data):
-        self.mysql_pass = self.select("SELECT var_pass FROM User WHERE var_user = 'admin'")
-        self.mysql_encryption = "SELECT AES_DECRYPT('%s', '%s')" % (data, self.mysql_pass[0][0])
-
     def dropUser(self, userName) -> bool:
         """
         Procedimiento ejecutado para eliminar un usuario.
@@ -162,10 +145,10 @@ class MySQLEngine:
         try:            
 
             self.mysql_sgbd = "DROP USER '%s'@'%s'" % (userName, self.server)
-            #self.mysql_delete = "DELETE FROM Users WHERE var_user = %s"
-            self.mysql_delete = "DELETE FROM Users WHERE var_user = ft_encrypt(%s)" % (userName)            
+            self.mysql_delete = "DELETE FROM Users WHERE var_user = %s"
+            self.data = userName
 
-            self.link.execute(self.mysql_delete)
+            self.link.execute(self.mysql_delete, (self.data,))
             self.link.execute(self.mysql_sgbd)
             self.con.commit()
 
@@ -180,12 +163,11 @@ class MySQLEngine:
         """
         Devuelve una lista con el nombre de los usuarios
         """
-        #self.mysql_consult = self.select("SELECT var_user FROM Users")
         self.mysql_consult = self.select("SELECT var_user FROM Users")
         self.userArray= []
 
         for name in self.mysql_consult:
-            self.userArray.append(self.decrypt(name))
+            self.userArray.append(name)
 
         return self.userArray
         
@@ -205,7 +187,7 @@ class MySQLEngine:
             if newUserName:
                 #Procedimiento para cambiar nombre
                 self.mysql_alterName = "RENAME USER '%s'@'%s' TO '%s'@'%s'" % (userName, self.server, newUserName, self.server)
-                self.mysql_modifyName = "UPDATE Users SET var_user = ft_encrypt('%s') WHERE var_user = '%s'" % (newUserName, userName)
+                self.mysql_modifyName = "UPDATE Users SET var_user = '%s' WHERE var_user = '%s'" % (newUserName, userName)
                 #self.data = (newUserName, userName)
                 self.link.execute(self.mysql_alterName)
                 self.link.execute(self.mysql_modifyName)
@@ -234,11 +216,9 @@ class MySQLEngine:
 
         else:
             self.mysql_insert = "INSERT INTO Draws(userId, var_name, jso_drawInfo) VALUES (%s, '%s', '%s')" % (self.mysql_userId, drawName, drawConfig)
-          
             self.link.execute(self.mysql_insert)
             self.con.commit()
             print("Dibujo insertado")
-
             return {"status":True, "message":"Draw inserted"}
 
     def dropDraw(self, drawId):
@@ -284,8 +264,7 @@ class MySQLEngine:
         except mysql.connector.Error as error:
             print("No se han podido recuperar los dibujos {}".format(error))
     
-    def userData(self):
-        userName = self.user
+    def userData(self, userName):
         self.mysql_userId = self.select("SELECT id FROM Users WHERE var_user = '%s'" % (userName))[0][0]
 
         self.mysql_userCategory = self.select("SELECT var_category FROM Users WHERE var_user = '%s'" % (userName))[0][0]
@@ -300,12 +279,13 @@ class MySQLEngine:
 
     def retrieveBinnacleInfo(self):
         try:
-            self.mysql_binnacle = self.select("SELECT Us.var_user, Bin.tex_event, DATE(Bin.tim_time), TIME(Bin.tim_time) FROM Binnacle Bin JOIN Users Us ON Bin.userId = Us.id")
+            self.mysql_binnacle = self.select("SELECT tex_event, DATE(tim_time), TIME(tim_time) FROM Binnacle")
 
-            return self.mysql_binnacle
+            return self.mysql_binnacle[0][0]
 
         except mysql.connector.Error as error:
             print("No se puedieron recuperar los registros de bitácora. {}").format(error)
 
-    def isAdmin(self):
-        return self.mysql_userCategory == "Administrador"
+        
+        
+

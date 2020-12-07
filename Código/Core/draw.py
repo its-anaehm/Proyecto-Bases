@@ -1,8 +1,8 @@
 # The imports include turtle graphics and tkinter modules.
 # The colorchooser and filedialog modules let the user
 # pic a color and a filename.
-from Core.MySQLEngineBackUp import MySQLEngineBackUp
 from Core.SettingsGUI import SettingsGUI
+from Core.MySQLEngineBackUp import MySQLEngineBackup
 from tkinter import messagebox
 from tkinter.constants import COMMAND
 from Core.ChooseDraw import ChooseDraw
@@ -222,8 +222,6 @@ class DrawingApplication(tkinter.Frame):
             for commandElement in graphicsCommands:
                 command = commandElement["command"]
 
-                cmd = ""
-
                 if command == "GoTo":
                     x = commandElement["x"]
                     y = commandElement["y"]
@@ -328,11 +326,12 @@ class DrawingApplication(tkinter.Frame):
         def saveFile():
             #filename = tkinter.filedialog.asksaveasfilename(title="Save Picture As...")
             filename = simpleDialog.askstring("Save draw","Write the name of the draw.")
+            JSONDraw = drawToJSON()
             if filename:
-                result = self.sgbd.insertDraw(drawName=filename, drawConfig=drawToJSON())
-                backUp = MySQLEngineBackUp()
-                backUp.insertDraw(drawName=filename, drawConfig=drawToJSON())
-
+                result = self.sgbd.insertDraw(drawName=filename, drawConfig=JSONDraw)
+                backUp = MySQLEngineBackup()
+                backUp.connect(filename = "Core/connectionConfigBackup.ini")
+                backUp.insertDraw(self.sgbd.mysql_userId,filename,JSONDraw)
                 if result["status"]:
                     fileAbsPath = os.path.join(os.path.abspath("."),"%s.json" % filename)
                     print(fileAbsPath)
@@ -439,12 +438,7 @@ class DrawingApplication(tkinter.Frame):
             if color != None:
                 penColor.set(str(color)[-9:-2])
         
-        penColorButton = tkinter.Button(
-            sideBar, 
-            text = "Pick Pen Color", 
-            command=getPenColor, 
-            state=tkinter.DISABLED if not self.sgbd.isAdmin() else tkinter.NORMAL
-            )
+        penColorButton = tkinter.Button(sideBar, text = "Pick Pen Color", command=getPenColor)
         penColorButton.pack(fill=tkinter.BOTH)
 
         fillLabel = tkinter.Label(sideBar,text="Fill Color")
@@ -459,16 +453,8 @@ class DrawingApplication(tkinter.Frame):
             if color != None:
                 fillColor.set(str(color)[-9:-2])
         
-        fillColorButton = tkinter.Button(
-            sideBar,
-            text="Pick Fill Color", 
-            command=getFillColor,
-            state=tkinter.DISABLED if not self.sgbd.isAdmin() else tkinter.NORMAL
-            )
-
-        fillColorButton.pack(fill=tkinter.BOTH)
-        fillColorButton.pack(fill=tkinter.BOTH)
-        fillColorButton.pack(fill=tkinter.BOTH)
+        fillColorButton = \
+            tkinter.Button(sideBar,text="Pick Fill Color", command=getFillColor)
         fillColorButton.pack(fill=tkinter.BOTH)
 
 
@@ -563,8 +549,8 @@ class DrawingApplication(tkinter.Frame):
             root.title("Settings")
             root.mainloop()
 
-        if self.sgbd.isAdmin():
-            fileMenu.add_command(label="Settings", command=settings)
+
+        fileMenu.add_command(label="Settings", command=settings)
 
 
         fileMenu.add_command(label="Exit",command=self.master.quit)
