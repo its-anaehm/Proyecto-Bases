@@ -11,4 +11,3 @@ CREATE TABLE Draws(
     blo_drawInfo BLOB NOT NULL COMMENT "Contiene archivos .json encriptados con la información del dibujo."
 
 ) COMMENT "Dibujos realizados por los usuarios.";
-

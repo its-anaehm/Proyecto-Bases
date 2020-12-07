@@ -222,6 +222,8 @@ class DrawingApplication(tkinter.Frame):
             for commandElement in graphicsCommands:
                 command = commandElement["command"]
 
+                cmd = ""
+
                 if command == "GoTo":
                     x = commandElement["x"]
                     y = commandElement["y"]
@@ -437,7 +439,12 @@ class DrawingApplication(tkinter.Frame):
             if color != None:
                 penColor.set(str(color)[-9:-2])
         
-        penColorButton = tkinter.Button(sideBar, text = "Pick Pen Color", command=getPenColor)
+        penColorButton = tkinter.Button(
+            sideBar, 
+            text = "Pick Pen Color", 
+            command=getPenColor, 
+            state=tkinter.DISABLED if not self.sgbd.isAdmin() else tkinter.NORMAL
+            )
         penColorButton.pack(fill=tkinter.BOTH)
 
         fillLabel = tkinter.Label(sideBar,text="Fill Color")
@@ -452,8 +459,16 @@ class DrawingApplication(tkinter.Frame):
             if color != None:
                 fillColor.set(str(color)[-9:-2])
         
-        fillColorButton = \
-            tkinter.Button(sideBar,text="Pick Fill Color", command=getFillColor)
+        fillColorButton = tkinter.Button(
+            sideBar,
+            text="Pick Fill Color", 
+            command=getFillColor,
+            state=tkinter.DISABLED if not self.sgbd.isAdmin() else tkinter.NORMAL
+            )
+
+        fillColorButton.pack(fill=tkinter.BOTH)
+        fillColorButton.pack(fill=tkinter.BOTH)
+        fillColorButton.pack(fill=tkinter.BOTH)
         fillColorButton.pack(fill=tkinter.BOTH)
 
 
@@ -548,8 +563,8 @@ class DrawingApplication(tkinter.Frame):
             root.title("Settings")
             root.mainloop()
 
-
-        fileMenu.add_command(label="Settings", command=settings)
+        if self.sgbd.isAdmin():
+            fileMenu.add_command(label="Settings", command=settings)
 
 
         fileMenu.add_command(label="Exit",command=self.master.quit)
