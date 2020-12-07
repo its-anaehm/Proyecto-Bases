@@ -42,84 +42,44 @@ CREATE TABLE Binnacle(
         ON UPDATE CASCADE
 );
 
--- DELETE FROM Users WHERE var_user = "admin" and var_pass = "admin" and var_category = "Administrador";
-
--- DELIMITER $$
-
---     DROP PROCEDURE IF EXISTS sp_addUser $$
-
---     CREATE PROCEDURE sp_addUser(IN userName VARCHAR(50), IN pass VARCHAR(50))
-
---     BEGIN
-
---         DECLARE `_HOST` CHAR(14) DEFAULT '@\'localhost\'';
---         SET `userName` := CONCAT('\'', REPLACE(TRIM(`userName`), CHAR(39), CONCAT(CHAR(92), CHAR(39))), '\''),
---         `pass` := CONCAT('\'', REPLACE(`pass`, CHAR(39), CONCAT(CHAR(92), CHAR(39))), '\'');
---         SET @`sql` := CONCAT('CREATE USER ', `userName`, `_HOST`, ' IDENTIFIED BY ', `pass`);
---         PREPARE `stmt` FROM @`sql`;
---         EXECUTE `stmt`;
---         SET @`sql` := CONCAT('GRANT ALL PRIVILEGES ON *.* TO ', `userName`, `_HOST`);
---         PREPARE `stmt` FROM @`sql`;
---         EXECUTE `stmt`;
---         DEALLOCATE PREPARE `stmt`;
---         FLUSH PRIVILEGES;
-
---         INSERT INTO Users(var_user, var_pass) VALUES (userName, pass);
-
---     END $$
-
---     DROP PROCEDURE IF EXISTS sp_lookDraws $$
-
---     CREATE PROCEDURE sp_lookDraws(IN userName VARCHAR(50))
-
---     BEGIN
---         SET @name = userName;
---         IF (SELECT userName IN (SELECT var_user FROM Users)) THEN
-
---             DROP VIEW IF EXISTS showUserDraws;
-
---             CREATE VIEW showUserDraws AS
---                 SELECT *
---                     FROM Draws
---                     WHERE var_user = @name;
-        
---         END IF;
-            
---     END $$
-
---     DROP PROCEDURE IF EXISTS sp_deleteUser $$
-
---     CREATE PROCEDURE sp_deleteUser(IN userName VARCHAR(50))
-
---     BEGIN
-        
---         IF(SELECT userName IN (SELECT var_user FROM Users)) THEN
-
---             DROP USER userName@'localhost';
-
---             DELETE FROM Users WHERE var_user = userName;
-
---         END IF;
-
---     END $$
-
--- DELIMITER ;
-
--- CALL sp_addUser("sebastian", "holi");
--- CALL sp_addUser("odin", "soidiosito");
 
 DELIMITER $$
+
+    DROP FUNCTION IF EXISTS ft_encrypt $$
+    CREATE FUNCTION ft_encrypt(dataToEncrypt VARCHAR(50)) RETURNS TEXT DETERMINISTIC
+        BEGIN
+            DECLARE encryptedData TEXT;
+            DECLARE pass VARCHAR(50);
+
+            (SELECT var_pass from Users WHERE var_user = "admin") INTO pass;
+            SELECT AES_ENCRYPT(dataToEncrypt, pass) INTO encryptedData;
+
+            RETURN encryptedData;
+        END $$
+
+    DROP FUNCTION IF EXISTS ft_decrypt $$
+    CREATE FUNCTION ft_decrypt(dataToDecrypt VARCHAR(50)) RETURNS TEXT DETERMINISTIC
+        BEGIN
+            DECLARE decryptedData TEXT;
+            DECLARE pass VARCHAR(50);
+
+            SELECT AES_DECRYPT(dataToEncrypt, pass) INTO decryptedData;
+            (SELECT var_pass from Users WHERE var_user = "admin") INTO pass;
+
+            RETURN encryptedData;
+        END $$  
 
     DROP TRIGGER IF EXISTS bin_addUser $$
     CREATE TRIGGER bin_addUser AFTER INSERT ON Users
         FOR EACH ROW
-        BEGIN            
+        BEGIN
             INSERT INTO Binnacle(userId, tex_event) VALUES(
                 (SELECT Us.id                    
                     FROM Users Us
                     WHERE ((SUBSTRING_INDEX(CURRENT_USER(), "@",1))) = Us.var_user),
                 "Inserción de Usuario"
               );
+            
         END $$
 
     DROP TRIGGER IF EXISTS bin_deleteUser $$ 
@@ -209,6 +169,7 @@ DELIMITER $$
             GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost' WITH GRANT OPTION;
         
         END $$
+    
 
 DELIMITER ;
 
