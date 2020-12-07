@@ -39,7 +39,7 @@ Podemos definir el conjunto de relaciones de la siguiente manera:
 
 ### <span style="color:#3498DB">**Tabla *Users***</span>
 
-Esta tabla representa los usuarios ingresados a la base de datos. Y que seran los encargados de la creación de dibujos, así como también de las actividades de modificación para el caso de los administradores.
+Esta tabla representa los usuarios ingresados a la base de datos. Y que serán los encargados de la creación de dibujos, así como también de las actividades de modificación para el caso de los administradores.
 
 ![DBA-001](https://drive.google.com/uc?export=view&id=1_LvawqUe2D5J9MyeY26Xe33Wl531Tb3h "DBA-001.png")
 
@@ -70,7 +70,7 @@ Estos atributos son las propiedades de cada dibujo necesarias para su creación 
 
 ### <span style="color:#3498DB">**Tabla *drawsConfig***</span>
 
-Esta tabla representa las configuraciónes con respecto al color para los dibujos creados por los usuarios.
+Esta tabla representa las configuraciones con respecto al color para los dibujos creados por los usuarios.
 
 ![DBA-003](https://drive.google.com/uc?export=view&id=1Le0OgJOtEdicEzHZpcZSSFLJ633eHI14 "DBA-003.png")
 
@@ -83,20 +83,20 @@ Estos atributos son las propiedades de la configuración del dibujo necesarias p
 
 ### <span style="color:#3498DB">**Tabla *Binnacle***</span>
 
-Esta tabla representa la bitácora que funciona como módulo de registro de actividades dentro del programa. 
+Esta tabla representa la bitácora que funciona como módulo de registro de actividades dentro del programa.
 
 ![DBA-004](https://drive.google.com/uc?export=view&id=1AvLWkjNyKK8ihWDynhvXGyDdJiRi87NO "DBA-4.png")
 
 Se definen cinco atributos para la tabla Binnacle los cuales son:
 
 - ***id:*** Un atributo de tipo de dato entero con valor autoincremental, definido como la llave primaria de la tabla; este dato es único para cada bitácora, que se ingresa en la base de datos y nos permite identificar el usuario y sus respectivos dibujos en cualquier otra instancia necesaria.
-- ***userId:*** Atributo de tipo de dato entero no nulo, definido en la tabla users y llave foranea de la tabla binnacle; este dato permite vincular a un usuario con sus distintas acciones y estas serán guardadas como parte de un historial de trabajo en la bitácora.
+- ***userId:*** Atributo de tipo de dato entero no nulo, definido en la tabla users y llave foránea de la tabla binnacle; este dato permite vincular a un usuario con sus distintas acciones y estas serán guardadas como parte de un historial de trabajo en la bitácora.
 - ***tex_event:*** Atributo de tipo de dato text no nulo, que se encarga de determinar cuál es la acción realizada dentro del programa que puede variar entre la creación, modificación y eliminación de usuarios o dibujos.
 - ***tim_time:*** Atributo de tipo de dato timestamp no nulo, que guarda el registro de la hora y fecha instantánea en la que fue realizado algún evento.
 
-Estos atributos son las propiedades de la bitácora necesarias para su creación y validación dentro del programa y la base de datos, los cuales no son modificables por ningun usuario del programa.
+Estos atributos son las propiedades de la bitácora necesarias para su creación y validación dentro del programa y la base de datos, los cuales no son modificables por ningún usuario del programa.
 
-La bitácora es capáz de guardar todas las acciones del usuario, incluyendo entre ellas a la autenticación, visualización, creación, modificación, eliminación de dibujos, configuración de colores y usuarios. Estas actividades son las que realizan todos los usuarios sin importar la categoria.
+La bitácora es capaz de guardar todas las acciones del usuario, incluyendo entre ellas la autenticación, visualización, creación, modificación, eliminación de dibujos, configuración de colores y usuarios. Estas actividades son las que realizan todos los usuarios sin importar la categoría.
 
 -----
 
@@ -115,7 +115,7 @@ Para la creación de los trigger se utilizan algunas funciones de sql como:
 
 ![DBA-005](https://drive.google.com/uc?export=view&id=1fxFfqB165Wm7Tt-wMy-MDBScJtBI3RRe "DBA-005.png")
 
-Se elimina el trigger *bin_addUser* si es que este existe y posteriormente se crea; este triggertrabaja con la tabla *Users* y la acción que realiza es que después de insertar en la tabla *Users* a un usuario, agregar el evento al historial de actividades que se encuentra en la tabla *Binnacle*.
+Se elimina el trigger *bin_addUser* si es que este existe y posteriormente se crea; este trigger trabaja con la tabla *Users* y la acción que realiza es que después de insertar en la tabla *Users* a un usuario, agregar el evento al historial de actividades que se encuentra en la tabla *Binnacle*.
 
 El evento que desempeña un usuario al agregarse al programa, en este caso en específico al ser agregado a la base de datos, se hace con los valores de nombre del usuario (var_user) obteniendolo de la tabla Users e identificandolo con su id y el evento que en este caso se define como *"Inserción de Usuario"*.
 
@@ -174,7 +174,6 @@ Al ser modificado en la base de datos se debe identificar con los valores de nom
 -----
 
 ![DBA-012](https://drive.google.com/uc?export=view&id=1mUGA8LDPqwqiQd6XrvqpNVpKqTNG16YN "DBA-012.png")
-
-Se debe eliminar el procedimiento almacenado *sp_addMainUser* en caso de que ya exista y posterior mente se crea, este procedimiento recibe como parametro la categoría para validar al usuario administrador.
+Se debe eliminar el procedimiento almacenado *sp_addMainUser* en caso de que ya exista y posteriormente se crea, este procedimiento recibe como parámetro la categoría para validar al usuario administrador.
 
 Dentro de la lógica del procedimiento lo que se hace es crear (si no es que ya existe) al usuario administrador y otorgarle todos los privilegios que va a tener dentro del programa; dentro de los que reacaen cosas como, agregar, modificar y eliminar tanto usuarios como dibujos.

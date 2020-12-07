@@ -10,9 +10,9 @@ A continuación se presenta una explicación detallada de todos los elementos qu
 
 -----
 
-La base de datos B es requerida para guardar archivos JSON de resaldo con compresión. Estos archivos JSON deben ser los mismos que se almacenan en la base de datos A con tipo de dato JSON y que funcionan como componentes de almacenamiento de datos del sistema de dibujo.
+La base de datos B es requerida para guardar archivos JSON de respaldo con compresión. Estos archivos JSON deben ser los mismos que se almacenan en la base de datos A con tipo de dato JSON y que funcionan como componentes de almacenamiento de datos del sistema de dibujo.
 
-![M&DER](https://drive.google.com/uc?export=view&id=1KU8MS-PngERSjkfhbSpVskMQUXF67q3u "M&DER.png")
+![M&DER](https://drive.google.com/uc?export=view&id=1V1G3cDie8m9x_CHkYszBgZ4S9EvJCxpR "M&DER.png")
 
 Este diagrama y modelado fueron creados bajo la percepción general de la entidad *Draws* con sus atributos:
 
@@ -40,7 +40,7 @@ Esta tabla representa los dibujos creados por los usuarios que pasan a la base d
 Se definen cuatro atributos para la tabla Draws los cuales son:
 
 - ***id:*** Un atributo de tipo de dato entero con valor autoincremental, definido como la llave primaria de la tabla; este dato es único para cada dibujo generado por los usuarios, que se ingresa en la base de datos y nos permite identificarlo en cualquier otra instancia necesaria.
-- ***userId:*** Atributo de tipo de dato entero no nulo, definido en la tabla users y llave foránea de la tabla draws; este dato permite vincular a un usuario con sus dibujos en la tabla draws ya que el usuario puede realizar uno o varios dibujos.
+- ***userId:*** Atributo de tipo de dato entero no nulo; este dato permite vincular a un usuario con sus dibujos en la tabla draws ya que el usuario puede realizar uno o varios dibujos.
 - ***var_name:*** Atributo de tipo de dato varchar no nulo, que corresponde al nombre del dibujo creado por el usuario, este dato es asignado por el usuario, ya sea un usuario normal o el administrador.
 - ***blo_drawInfo:*** Atributo de tipo de dato BLOB no nulo. Este dato contiene el archivo .json encriptado con la información de respaldo de los dibujos en la base de datos A.
 
