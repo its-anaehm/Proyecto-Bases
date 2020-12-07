@@ -1,6 +1,7 @@
 # The imports include turtle graphics and tkinter modules.
 # The colorchooser and filedialog modules let the user
 # pic a color and a filename.
+from Core.MySQLEngineBackUp import MySQLEngineBackUp
 from Core.SettingsGUI import SettingsGUI
 from tkinter import messagebox
 from tkinter.constants import COMMAND
@@ -327,6 +328,9 @@ class DrawingApplication(tkinter.Frame):
             filename = simpleDialog.askstring("Save draw","Write the name of the draw.")
             if filename:
                 result = self.sgbd.insertDraw(drawName=filename, drawConfig=drawToJSON())
+                backUp = MySQLEngineBackUp()
+                backUp.insertDraw(drawName=filename, drawConfig=drawToJSON())
+
                 if result["status"]:
                     fileAbsPath = os.path.join(os.path.abspath("."),"%s.json" % filename)
                     print(fileAbsPath)

@@ -12,11 +12,11 @@ import configparser
 
 class MySQLEngine:
 
-    def __init__(self):
+    def __init__(self, configFile = "./Core/conectionConfig.ini"):
 
         # Reading data from config file
         self.config = configparser.ConfigParser()
-        self.config.read("./Core/conectionConfig.ini")
+        self.config.read(configFile)
         self.config.sections()
         self.port = self.config['DEFAULT']['port']
         self.database = self.config['DEFAULT']['database']
@@ -41,7 +41,7 @@ class MySQLEngine:
             self.link = self.con.cursor()
             self.user = userName
             self.password = password
-            self.userData(userName)
+            self.userData()
             
             return {"status":True, "message":"Logged"}
             
@@ -216,9 +216,11 @@ class MySQLEngine:
 
         else:
             self.mysql_insert = "INSERT INTO Draws(userId, var_name, jso_drawInfo) VALUES (%s, '%s', '%s')" % (self.mysql_userId, drawName, drawConfig)
+          
             self.link.execute(self.mysql_insert)
             self.con.commit()
             print("Dibujo insertado")
+
             return {"status":True, "message":"Draw inserted"}
 
     def dropDraw(self, drawId):
@@ -264,7 +266,8 @@ class MySQLEngine:
         except mysql.connector.Error as error:
             print("No se han podido recuperar los dibujos {}".format(error))
     
-    def userData(self, userName):
+    def userData(self):
+        userName = self.user
         self.mysql_userId = self.select("SELECT id FROM Users WHERE var_user = '%s'" % (userName))[0][0]
 
         self.mysql_userCategory = self.select("SELECT var_category FROM Users WHERE var_user = '%s'" % (userName))[0][0]

@@ -203,7 +203,7 @@ DELIMITER $$
     CREATE PROCEDURE sp_addMainUser(IN category VARCHAR(50))
         BEGIN
 
-            INSERT INTO Users(var_user, var_pass, var_category) VALUES(((SUBSTRING_INDEX(CURRENT_USER(), "@",1))), 'admin', category);
+            INSERT INTO Users(var_user, var_pass, var_category) VALUES('admin', 'admin', category);
             
             CREATE USER IF NOT EXISTS 'admin'@'localhost' IDENTIFIED BY 'admin';
             GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost' WITH GRANT OPTION;
