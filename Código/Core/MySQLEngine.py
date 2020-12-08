@@ -287,6 +287,24 @@ class MySQLEngine:
         except mysql.connector.Error as error:
             print("No se puedieron recuperar los registros de bitácora. {}").format(error)
 
+    def updateDrawConfiguration(self, pennColor=None, fillColor=None):
+        
+        if pennColor:
+            self.mysql_config = "UPDATE drawsConfig SET var_penColor = %s" % (pennColor)
+
+            self.link.execute(self.mysql_config)
+            self.con.commit()
+
+        if fillColor:
+            self.mysql_config = "UPDATE drawsConfig SET var_fillColor = %s" % (fillColor)
+
+            self.link.execute(self.mysql_config)
+            self.con.commit()
+            
+    def retrieveColorConfig(self):
+        self.mysql_colorConfiguration = self.select("SELECT * FROM drawsConfig")
+
+        return self.mysql_colorConfiguration[0]
         
         
 

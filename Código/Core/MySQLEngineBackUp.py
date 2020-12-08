@@ -116,9 +116,9 @@ class MySQLEngineBackup:
             f.close()
 
             # Comprime la el archivo en formato .gz mediante la terminal
-            #subprocess.call(['gzip', '-9', fileAbsPath])  
-            #compressedFilePath = "%s.gz" % fileAbsPath
-            compressedFilePath = "%s" % fileAbsPath
+            subprocess.call(['gzip', '-9', fileAbsPath])  
+            compressedFilePath = "%s.gz" % fileAbsPath
+            #compressedFilePath = "%s" % fileAbsPath
             
 
             f = open(compressedFilePath, "rb")
@@ -151,6 +151,21 @@ class MySQLEngineBackup:
             print("Borrando de dibujo. {}".format(error))
             return {"status":False, "message":"Fail F"}
 
+    def deleteAllUserDraws(self, userId):
+        try:
+            self.cursor.execute(
+                "DELETE FROM Draws WHERE userId = %s",
+                (userId,)
+            )
+            self.connection.commit()
+            print("Dibujos eliminados de B")
+            return {"status":True, "message":"Draws deleted"}
+
+        except mysql.connector.Error as error:
+            print("Borrando de dibujo. {}".format(error))
+            return {"status":False, "message":"Fail F"}
+        
+
     def modifyDraw(self, userId, drawName, drawJSON):
         try:
             self.cursor.execute(
@@ -176,15 +191,26 @@ class MySQLEngineBackup:
         )
         
         fn = filedialog.asksaveasfilename(initialdir=os.getcwd(), title="Save File")
-        
+        fn = "%s.json.gz" % fn
         r = self.cursor.fetchall()
+
+        f = open(fn, "wb")
+
+        f.write(r[0][0])
+
+        f.close()
+
+
+        """
         for i in r:
     	    data = i[0] # this is the binary from database
         with open(fn,"wb") as f:
 	        f.write(data)
         f.close()
+        """
         
-        #subprocess.call(['gzip', '-d', fileName])  #descomprime el archivo
+        subprocess.call(['gzip', '-d', fn])  #descomprime el archivo
+
 
 
 
@@ -205,4 +231,4 @@ class MySQLEngineBackup:
 
 bk = MySQLEngineBackup()
 bk.connect(filename="Core/connectionConfigBackup.ini")
-bk.download(19,"Core/pruebaj.json")
+bk.download(24,"Core/pruebaj.json")
