@@ -17,14 +17,14 @@ class Encryptor:
     def __init__(self):
         pass
 
-    def encrypt(self,data, password):
+    def encrypt(self,data, password="admin"):
         encode = []
         for i in range(len(data)):
             passChar = password[i%len(password)]
             encode.append(chr(ord(data[i] )+ ord(passChar)))
         return "".join(encode)
 
-    def decrypt(self,data, password):
+    def decrypt(self,data, password="admin"):
         encode = []
         for i in range(len(data)):
             passChar = password[i%len(password)]

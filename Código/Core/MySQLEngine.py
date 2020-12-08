@@ -90,6 +90,7 @@ class MySQLEngine:
     
 
     def addUser(self, userName, userPassword, admin) -> bool:
+ 
         """
         Método para agregar un usuario a la base de datos de usuarios y como
         usuario del sistema de gestión de base de datos, tambien se encarga de establecer

@@ -3,6 +3,8 @@ import tkinter
 from tkinter import TkVersion, ttk
 from tkinter import Tk
 from typing import ValuesView
+from Core.Encryptor import Encryptor
+
 
 class ChooseDraw(ttk.Frame):
     """
@@ -30,7 +32,9 @@ class ChooseDraw(ttk.Frame):
         ttk.Button(self,text="Choose Draw",command=self.getSelected).pack()
     
     def fillTreeView(self):
+        encryptor = Encryptor()
         for draw in self.sgbd.retrieveDraws():
+            draw[1] = encryptor.decrypt(draw[1])
             self.treeView.insert('','end',values=draw)
 
     def getSelected(self):

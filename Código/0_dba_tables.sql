@@ -1,0 +1,48 @@
+
+DROP DATABASE IF EXISTS DBA;
+
+CREATE DATABASE DBA;
+
+USE DBA;
+
+CREATE TABLE Users(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    var_user TEXT NOT NULL,
+    var_pass TEXT NOT NULL,
+    var_category TEXT NOT NULL
+);
+
+CREATE TABLE Draws(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    userId INT NOT NULL,
+    var_name VARCHAR(50) NOT NULL,
+    tim_time TIMESTAMP DEFAULT NOW(),
+    jso_drawInfo JSON NOT NULL,
+
+    FOREIGN KEY (userId)
+        REFERENCES Users(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+CREATE TABLE drawsConfig(    
+    var_penColor VARCHAR(50) NOT NULL DEFAULT "#000000",
+    var_fillColor VARCHAR(50) NOT NULL DEFAULT "#000000"
+);
+
+CREATE TABLE Binnacle(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    userId INT NOT NULL,
+    tex_event TEXT NOT NULL,
+    tim_time TIMESTAMP DEFAULT NOW(),
+
+    FOREIGN KEY (userId)
+        REFERENCES Users(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+INSERT INTO drawsConfig() VALUES ();
+
+
+

@@ -2,6 +2,9 @@
 import os
 import subprocess
 
+from tkinter import *
+from tkinter import filedialog, messagebox
+
 import mysql
 import mysql.connector as DBCon
 import configparser
@@ -106,20 +109,22 @@ class MySQLEngineBackup:
 
         else:
             self.connection
-            print("Bases de datos B")
+            
             fileAbsPath = os.path.join(os.path.abspath("."), "%s.json" % drawName)
             f = open(fileAbsPath, "w")  # Se guardará como un archivo .json
             f.write(drawJSON)
+            f.close()
 
-            subprocess.call(['gzip', '-9', fileAbsPath])  # Comprime la el archivo en formato .gz
-            compressedFilePath = "%s.gz" % fileAbsPath
+            # Comprime la el archivo en formato .gz mediante la terminal
+            #subprocess.call(['gzip', '-9', fileAbsPath])  
+            #compressedFilePath = "%s.gz" % fileAbsPath
+            compressedFilePath = "%s" % fileAbsPath
+            
 
             f = open(compressedFilePath, "rb")
             data = f.read()  # Lee los bits del archivo comprimido
-
+            f.close()
             # Guarda los bits en la base de datos
-            # self.mysql_insert = "INSERT INTO Draws(userId, var_name, blo_drawInfo) VALUES (%s, %s, %s)"
-            # self.link.execute(self.mysql_insert, (1,drawName,data, ))
             self.cursor.execute(
                 "INSERT INTO Draws(userId, var_name, blo_drawInfo) VALUES (%s, %s, %s)",
                 (userId, drawName, data)
@@ -127,8 +132,7 @@ class MySQLEngineBackup:
 
             self.connection.commit()
 
-
-            subprocess.call(['rm', compressedFilePath])
+            # subprocess.call(['rm', compressedFilePath])
 
             print("Dibujo insertado")
             return {"status": True, "message": "Draw inserted"}
@@ -140,7 +144,7 @@ class MySQLEngineBackup:
                 (userId, drawName)
             )
             self.connection.commit()
-            print("Dibujo eliminado")
+            print("Dibujo eliminado de B")
             return {"status":True, "message":"Draw deleted"}
 
         except mysql.connector.Error as error:
@@ -161,6 +165,27 @@ class MySQLEngineBackup:
         except mysql.connector.Error as error:
             return {"status":False, "message":"Fail updated"}
 
+    def download(self, drawId:int, path:str):
+        """
+        Descarga los dibujos del usuario.
+        """
+        
+        self.cursor.execute(
+            "SELECT blo_drawInfo FROM Draws WHERE id = %s",
+            (drawId, )
+        )
+        
+        fn = filedialog.asksaveasfilename(initialdir=os.getcwd(), title="Save File")
+        
+        r = self.cursor.fetchall()
+        for i in r:
+    	    data = i[0] # this is the binary from database
+        with open(fn,"wb") as f:
+	        f.write(data)
+        f.close()
+        
+        #subprocess.call(['gzip', '-d', fileName])  #descomprime el archivo
+
 
 
     def insertInto(self, tableName:str, fields:list, values:list):
@@ -177,3 +202,7 @@ class MySQLEngineBackup:
         print("DELETE FROM %s WHERE %s" % (tableName, condition))
         self.cursor.execute("DELETE FROM %s WHERE %s" % (tableName, condition))
 
+
+bk = MySQLEngineBackup()
+bk.connect(filename="Core/connectionConfigBackup.ini")
+bk.download(19,"Core/pruebaj.json")
