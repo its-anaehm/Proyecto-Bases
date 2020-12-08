@@ -3,10 +3,10 @@
     Clase: Bases de Datos I
     Sección: 0900
     Catedrático: José Manuel Inestroza Murillo
-    Alumnos: Emilio Sebastián Sosa Amador - 20171003818
-             Moisés David Gómez Amador - 20181001683
-             Leonardo Mass Sosa - 20171031716
-             Ana Evelin Hernández Martínez - 20171001620
+    Alumnos: Emilio Sebastián Sosa Amador - 20171003818 - 
+             Moisés David Gómez Amador - 20181001683 - mdgomeza@unah.hn
+             Leonardo Mass Sosa - 20171031716 - leonardo.mass@unah.hn
+             Ana Evelin Hernández Martínez - 20171001620 - aehernandezm@unah.hn
 
 # **Proyecto Final - Documentación (Análisis e Investigación)**
 
@@ -15,7 +15,8 @@
 - [**Proyecto Final - Documentación (Análisis e Investigación)**](#proyecto-final---documentación-análisis-e-investigación)
   - [**Índice**](#índice)
   - [**Lluvia de Ideas**](#lluvia-de-ideas)
-    - [Modelado ER y Diagrama ER](#modelado-er-y-diagrama-er)
+    - [**Modelados ER y Diagramas ER**](#modelados-er-y-diagramas-er)
+  - [**Diseño de Ventanas y sus Funciones**](#diseño-de-ventanas-y-sus-funciones)
   - [**Elementos Conceptuales**](#elementos-conceptuales)
     - [**Tkinter**](#tkinter)
     - [**configparser**](#configparser)
@@ -43,11 +44,21 @@
 
 -----
 
-### Modelado ER y Diagrama ER
+### **Modelados ER y Diagramas ER**
 
-Versión 1.0 del diagrama y modelado para la base de datos.
+A continuación se presentan los diagramas y modelados finales para ambas bases de datos con sus versiones correspondientes
 
-![MER-DER](https://drive.google.com/uc?export=view&id=19ON6s6Hk1CDcWWUe4Z46ZKGqVv8zEnkf "MER-DER.png")
+Versión 3.0 del diagrama y modelado para la base de datos A.
+
+![M&D-ER-A](https://drive.google.com/uc?export=view&id=13ynWUuLOS4r-CrPaJpXnfuOVNNLgk8R7 "M&D-ER-A.png")
+
+Versión 1.0 del diagrama y modelado para la base de datos B.
+
+![M&D-ER-B](https://drive.google.com/uc?export=view&id=1V1G3cDie8m9x_CHkYszBgZ4S9EvJCxpR "M&D-ER-B.png")
+
+-----
+
+## **Diseño de Ventanas y sus Funciones**
 
 -----
 
@@ -142,6 +153,8 @@ Se comenzo a trabajar en la estructura de la base de datos con tres tablas (una 
 
 ### **- Viernes 27/11/2020**
 
+Se comenzarón a crear las ventanas con la libreria tkinter para las distintas necesidades del programa.
+
 ### **- Sábado 28/11/2020**
 
 ### **- Domingo 29/11/2020**
@@ -178,4 +191,4 @@ Se comenzo a trabajar en la estructura de la base de datos con tres tablas (una 
 
 - [2]: Para las discución y la planeación del proyecto de forma asíncrona se creó un grupo de whatsapp y se le dio uso al canal de texto en el servidor de Discord.
 - [3]: (Enlace a la información sobre Tkinter).
-- [3]: (Bibliografía del libro).
+- [4]: (Bibliografía del libro).
