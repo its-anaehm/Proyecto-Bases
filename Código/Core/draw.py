@@ -426,6 +426,8 @@ class DrawingApplication(tkinter.Frame):
         penLabel.pack()
         penColor = tkinter.StringVar()
         penEntry = tkinter.Entry(sideBar,textvariable=penColor)
+        penEntry["state"] = tkinter.NORMAL if self.sgbd.isAdmin() else tkinter.DISABLED
+
         penEntry.pack()
         # This is the color from the DB.
         penColor.set(self.sgbd.retrieveColorConfig()[0])
@@ -443,10 +445,10 @@ class DrawingApplication(tkinter.Frame):
         fillLabel.pack()
         fillColor = tkinter.StringVar()
         fillEntry = tkinter.Entry(sideBar,textvariable=fillColor)
-        penColorButton["state"] = tkinter.NORMAL if self.sgbd.isAdmin() else tkinter.DISABLED
+        fillEntry["state"] = tkinter.NORMAL if self.sgbd.isAdmin() else tkinter.DISABLED
 
         fillEntry.pack()
-        fillColor.set("#000000")
+        fillColor.set(self.sgbd.retrieveColorConfig()[1])
 
         def getFillColor():
             color = tkinter.colorchooser.askcolor()
@@ -545,12 +547,12 @@ class DrawingApplication(tkinter.Frame):
 
         def settings():
             root = Tk()
-            settings = SettingsGUI(root,self.sgbd)
+            SettingsGUI(root,self.sgbd)
             root.title("Settings")
             root.mainloop()
 
-
-        fileMenu.add_command(label="Settings", command=settings)
+        if self.sgbd.isAdmin():
+            fileMenu.add_command(label="Settings", command=settings)
 
 
         fileMenu.add_command(label="Exit",command=self.master.quit)

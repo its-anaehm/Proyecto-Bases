@@ -21,6 +21,7 @@ class MySQLEngine:
         self.port = self.config['DEFAULT']['port']
         self.database = self.config['DEFAULT']['database']
         self.server = self.config['DEFAULT']['host']
+        self.adminPass = self.config['DEFAULT']['adminPass']
 
         self.con = None
 
@@ -28,7 +29,7 @@ class MySQLEngine:
         return self.con
 
     
-    def authentication(self, userName, password):
+    def authentication(self, userName:str, password:str) -> dict:
         try:
             self.con = mysql.connector.connect(
                 host=self.server,
@@ -41,7 +42,9 @@ class MySQLEngine:
             self.link = self.con.cursor()
             self.user = userName
             self.password = password
+
             self.userData(userName)
+            self.userLoginRegister(userName)
             
             return {"status":True, "message":"Logged"}
             
@@ -54,7 +57,7 @@ class MySQLEngine:
                 print(err)
                 return {"status":False, "message":"Error", "ErrorData":err.errno}
     
-    def select(self, query):
+    def select(self, query:str) -> list:
         """
         Encargada de ejecutar querys en la base de datos.
         :param q
@@ -71,14 +74,14 @@ class MySQLEngine:
 
         print("Connection ended.")
 
-    def userLoginRegister(self, userName):
+    def userLoginRegister(self, userName:str):
         """
         Se encarga de registrar en la bitácora el inicio de sesión de un usuario.
         :param userName: Nombre de usuario que inició sesión.
         :type userName: String.
         """
         try :
-            self.mysql_register = "INSERT INTO Binnacle(userId, tex_event) VALUES((SELECT Us.id FROM Users Us WHERE '%s' = Us.var_user), 'Inicio de Sesión')" % (userName)
+            self.mysql_register = "INSERT INTO Binnacle(userId, tex_event) VALUES((SELECT Us.id FROM Users Us WHERE AES_ENCRYPT('%s','%s') = Us.var_user), 'Inicio de Sesión')" % (userName,self.adminPass)
 
             self.link.execute(self.mysql_register)
             self.con.commit()
@@ -89,7 +92,7 @@ class MySQLEngine:
 
     
 
-    def addUser(self, userName, userPassword, admin) -> bool:
+    def addUser(self, userName:str, userPassword:str, admin:bool) -> bool:
  
         """
         Método para agregar un usuario a la base de datos de usuarios y como
@@ -122,6 +125,7 @@ class MySQLEngine:
                 self.mysql_grantDraws = "GRANT INSERT, SELECT ON %s.Draws TO '%s'@'%s'" % (self.database, userName, self.server)
                 self.mysql_grantBinnacle = "GRANT INSERT ON %s.Binnacle TO '%s'@'%s'" % (self.database, userName, self.server)
                 self.mysql_grantUsers = "GRANT SELECT ON %s.Users TO '%s'@'%s'" % (self.database, userName, self.server)
+                self.mysql_grantConfigurations = "GRANT SELECT ON %s.drawsConfig TO '%s'@'%s'" % (self.database, userName, self.server)
                 self.mysql_insert = "INSERT INTO Users(var_user, var_pass, var_category) VALUES (%s, %s, 'Operador')"
                 self.data = (userName, userPassword)
 
@@ -129,13 +133,15 @@ class MySQLEngine:
                 self.link.execute(self.mysql_grantDraws)
                 self.link.execute(self.mysql_grantBinnacle)
                 self.link.execute(self.mysql_grantUsers)
+                self.link.execute(self.mysql_grantConfigurations)
 
 
             self.con.commit()
             return True
 
-        except mysql.connector.Error as error:            
+        except mysql.connector.Error as error:
             print("Inserción fallida {}".format(error.errno))
+            return False            
 
     def dropUser(self, userName) -> bool:
         """
@@ -145,11 +151,10 @@ class MySQLEngine:
         """
         try:            
 
-            self.mysql_sgbd = "DROP USER '%s'@'%s'" % (userName, self.server)
-            self.mysql_delete = "DELETE FROM Users WHERE var_user = %s"
-            self.data = userName
+            self.mysql_sgbd = "DROP USER '%s'@'localhost'" % (userName)
+            self.mysql_delete = "DELETE FROM Users WHERE var_user = AES_ENCRYPT('%s','%s')" % (userName,self.adminPass)            
 
-            self.link.execute(self.mysql_delete, (self.data,))
+            self.link.execute(self.mysql_delete)
             self.link.execute(self.mysql_sgbd)
             self.con.commit()
 
@@ -164,7 +169,7 @@ class MySQLEngine:
         """
         Devuelve una lista con el nombre de los usuarios
         """
-        self.mysql_consult = self.select("SELECT var_user FROM Users")
+        self.mysql_consult = self.select("SELECT AES_DECRYPT(var_user, '%s') FROM Users" % (self.adminPass)) 
         self.userArray= []
 
         for name in self.mysql_consult:
@@ -172,7 +177,7 @@ class MySQLEngine:
 
         return self.userArray
         
-    def alterUser(self, userName, newUserName=None, password=None):
+    def alterUser(self, userName:str, newUserName:str=None, password:str=None) -> bool:
         """
         Modifica los atributos de un usuario de la base de datos.
         :param userName: Nombre del usuario a editar.
@@ -188,7 +193,7 @@ class MySQLEngine:
             if newUserName:
                 #Procedimiento para cambiar nombre
                 self.mysql_alterName = "RENAME USER '%s'@'%s' TO '%s'@'%s'" % (userName, self.server, newUserName, self.server)
-                self.mysql_modifyName = "UPDATE Users SET var_user = '%s' WHERE var_user = '%s'" % (newUserName, userName)
+                self.mysql_modifyName = "UPDATE Users SET var_user = '%s' WHERE var_user = AES_ENCRYPT('%s', '%s')" % (newUserName, userName, self.adminPass)
                 #self.data = (newUserName, userName)
                 self.link.execute(self.mysql_alterName)
                 self.link.execute(self.mysql_modifyName)
@@ -209,37 +214,45 @@ class MySQLEngine:
             print("Actualización de Usuario fallida. {}".format(error))
             return False
 
-    def insertDraw(self, drawName, drawConfig):     
-        self.mysql_nameExists = self.select(("SELECT id FROM Draws WHERE var_name = '%s' and userId = %d") % (drawName, self.mysql_userId))
+    def insertDraw(self, drawName:str, drawConfig:str) -> dict:
+        """
+        Almacena un dibujo nuevo en la base de datos.
+        :param drawName: Nombre del dibujo.
+        :param drawConfig: string que representa un json que es generado por el módulo de dibujo.
+        """
+        self.mysql_nameExists = self.select(("SELECT id FROM Draws WHERE var_name = AES_ENCRYPT('%s','%s') and userId = %d") % (drawName, self.adminPass,self.mysql_userId))
         
         if self.mysql_nameExists:
             return {"status":False, "message":"Draw already exist.", "drawId":self.mysql_nameExists[0][0]}
 
         else:
-            self.mysql_insert = "INSERT INTO Draws(userId, var_name, jso_drawInfo) VALUES (%s, '%s', '%s')" % (self.mysql_userId, drawName, drawConfig)
-            self.link.execute(self.mysql_insert)
+            self.mysql_insert = "INSERT INTO Draws(userId, var_name, jso_drawInfo) VALUES (%s, %s, %s)"
+            self.link.execute(self.mysql_insert,(self.mysql_userId, drawName, drawConfig))
             self.con.commit()
             print("Dibujo insertado")
             return {"status":True, "message":"Draw inserted"}
 
-    def dropDraw(self, drawId):
+    def dropDraw(self, drawId) -> bool:
         """
         Elimina un dibujo de la base de datos
-        :param userID: Ud del usuario dueño del dibujo
-        :param drawName: Nombre del dibujo
+        :param drawId: Id del dibujo a eliminar
         """
         try:
             self.mysql_delete = "DELETE FROM Draws WHERE id = %d" % (drawId)
-
             self.link.execute(self.mysql_delete)
             self.con.commit()
-
             print("Dibujo Eliminado.")
+            return True
 
         except mysql.connector.Error as error:
             print("Borrado de dibujo fallido. {}".format(error))
+            return False
 
-    def modifyDraw(self, drawId, drawJson):
+    def modifyDraw(self, drawId:int, drawJson):
+        """
+        Modifica los datos que representan un dibujo en la base de datos.
+        :param drawId: Id de la base de datos
+        """
         try:
             self.mysql_drawUpdate = "UPDATE Draws SET jso_drawInfo = '%s' WHERE id = %d" % (drawJson, drawId)
 
@@ -255,7 +268,7 @@ class MySQLEngine:
         :param userName: Nombre de usuario dueño de los dibujos.
         """
         try:            
-            self.mysql_drawQuery = "SELECT id, var_name, DATE(tim_time), TIME(tim_time) FROM Draws WHERE userId = %d" % (self.mysql_userId)
+            self.mysql_drawQuery = "SELECT id, AES_DECRYPT(var_name, %s), DATE(tim_time), TIME(tim_time) FROM Draws WHERE userId = %d" % (self.adminPass, self.mysql_userId)
             self.result = self.select(self.mysql_drawQuery)
 
             return self.result
@@ -265,33 +278,52 @@ class MySQLEngine:
         except mysql.connector.Error as error:
             print("No se han podido recuperar los dibujos {}".format(error))
     
-    def userData(self, userName):
-        self.mysql_userId = self.select("SELECT id FROM Users WHERE var_user = '%s'" % (userName))[0][0]
-
-        self.mysql_userCategory = self.select("SELECT var_category FROM Users WHERE var_user = '%s'" % (userName))[0][0]
-
+    def userData(self, userName) -> dict:
+        """
+        Realiza querys a la base de datos para obtener información del usuario.
+        Establece en el atributo mysql_userId el id del usuario.
+        Establece en el atributo mysql_userCategory la categoria del usuario
+        :param userName: Nombre de usuario del cual se recuperaran los datos.
+            Este debe ser un usuario existente en la tabla de usuarios.
+        """
+        self.mysql_userId = self.select("SELECT id FROM Users WHERE var_user = AES_ENCRYPT('%s','%s')" % (userName, self.adminPass))[0][0]
+        self.mysql_userCategory = self.select("SELECT AES_DECRYPT(var_category,'%s') FROM Users WHERE var_user = AES_ENCRYPT('%s','%s')" % (self.adminPass,userName, self.adminPass))[0][0]
         return {"id":self.mysql_userId, "category":self.mysql_userCategory}
+        
     
-    def isAdmin(self):
+    def isAdmin(self) -> bool:
+        """
+        Retorna si el usuario actual es administrador o no.
+        """
         return self.mysql_userCategory == "Administrador"
 
     def retrieveDrawJSON(self, drawID):
-        self.mysql_drawConfig = "SELECT jso_drawInfo FROM Draws WHERE id = %d" % (drawID)
+        """
+        Recupera desde la base de datos el JSON que representará un dibujo.
+        :param drawID: id que identifica el dibujo en la base de datos.
+        """
+        self.mysql_drawConfig = "SELECT AES_DECRYPT(jso_drawInfo, %s) FROM Draws WHERE id = %d" % (self.adminPass, drawID)
 
         self.result = self.select(self.mysql_drawConfig)
         return self.result[0][0]
 
-    def retrieveBinnacleInfo(self):
+    def retrieveBinnacleInfo(self) -> list:
+        """
+        Recupera desde la base de datos la información de la bitácora
+        """
         try:
-            self.mysql_binnacle = self.select("SELECT tex_event, DATE(tim_time), TIME(tim_time) FROM Binnacle")
-
-            return self.mysql_binnacle[0][0]
-
+            # ! Devolver el usuario en la primera posición
+            self.mysql_binnacle = self.select("SELECT AES_DECRYPT(Users.var_user, '%s'), tex_event, DATE(tim_time), TIME(tim_time) FROM Binnacle JOIN Users ON Binnacle.userId = Users.id" % self.adminPass) 
+            return self.mysql_binnacle
         except mysql.connector.Error as error:
-            print("No se puedieron recuperar los registros de bitácora. {}").format(error)
+            print("No se puedieron recuperar los registros de bitácora. {}".format(error))
 
     def updateDrawConfiguration(self, pennColor=None, fillColor=None):
-        
+        """
+        Guarda la configuracioón de dibujo en la base de datos.
+        :param pennColor: string que representa un número hexadecimal para el penColor.
+        :param fillColor: string que representa un número hexadecimal que será usado para el fillColor.
+        """
         if pennColor:
             self.mysql_config = "UPDATE drawsConfig SET var_penColor = %s" % (pennColor)
 
@@ -304,7 +336,11 @@ class MySQLEngine:
             self.link.execute(self.mysql_config)
             self.con.commit()
             
-    def retrieveColorConfig(self):
+    def retrieveColorConfig(self) -> tuple:
+        """
+        Recupera la configuración de dibujo (pen color y fill color) almacenada en
+        la base de datos.
+        """
         self.mysql_colorConfiguration = self.select("SELECT * FROM drawsConfig")
         return self.mysql_colorConfiguration[0]
         

@@ -7,9 +7,9 @@ USE DBA;
 
 CREATE TABLE Users(
     id INT AUTO_INCREMENT PRIMARY KEY,
-    var_user TEXT NOT NULL,
-    var_pass TEXT NOT NULL,
-    var_category TEXT NOT NULL
+    var_user VARCHAR(100) NOT NULL,
+    var_pass VARCHAR(100) NOT NULL,
+    var_category VARCHAR(20) NOT NULL
 );
 
 CREATE TABLE Draws(

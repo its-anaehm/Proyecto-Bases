@@ -1,6 +1,7 @@
 from Core.DropUserGUI import DropUserGUI
 from Core.AddUserGUI import AddUserGUI
 from Core.AlterUserGUI import ChoseUserToAlterGUI
+from Core.BinnacleGUI import BinnacleGUI
 from Core.MySQLEngine import *
 
 import tkinter
@@ -27,6 +28,11 @@ class SettingsGUI(ttk.Frame):
         ttk.Button(self,text="Add User",command=self.addUser).pack(padx=10,pady=10, fill=tkinter.BOTH)
         ttk.Button(self,text="Change Name and password to User",command=self.alterUser).pack(padx=10,pady=10,fill=tkinter.BOTH)
         ttk.Button(self,text="Delete User",command=self.deleteUser).pack(padx=10,pady=10,fill=tkinter.BOTH)
+        ttk.Button(self,text="Log registred data",command=self.getBinnacle).pack(padx=10,pady=10,fill=tkinter.BOTH)
+
+    def getBinnacle(self):
+        BinnacleGUI(self.master,self.sgbd)
+        self.destroy()
 
     def addUser(self):
         root2 = Tk()

@@ -212,8 +212,6 @@ class MySQLEngineBackup:
         subprocess.call(['gzip', '-d', fn])  #descomprime el archivo
 
 
-
-
     def insertInto(self, tableName:str, fields:list, values:list):
         """
 

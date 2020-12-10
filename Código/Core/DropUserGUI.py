@@ -55,5 +55,5 @@ class DropUserGUI(ttk.Frame):
         """
         Ejecuta un query para obtener el nombre de los usuarios.
         """
-        query = "SELECT var_user FROM Users"
+        query = "SELECT AES_DECRYPT(var_user,'%s') FROM Users" % self.sgbd.adminPass
         return self.sgbd.select(query)

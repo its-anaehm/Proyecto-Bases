@@ -3,7 +3,7 @@ from tkinter import TkVersion, ttk
 from tkinter import Tk
 from typing import ValuesView
 
-class BinnableGUI(ttk.Frame):
+class BinnacleGUI(ttk.Frame):
     def __init__(self, parent, sgbd):
         super().__init__(parent)
         self.sgbd = sgbd
