@@ -271,6 +271,9 @@ class MySQLEngine:
         self.mysql_userCategory = self.select("SELECT var_category FROM Users WHERE var_user = '%s'" % (userName))[0][0]
 
         return {"id":self.mysql_userId, "category":self.mysql_userCategory}
+    
+    def isAdmin(self):
+        return self.mysql_userCategory == "Administrador"
 
     def retrieveDrawJSON(self, drawID):
         self.mysql_drawConfig = "SELECT jso_drawInfo FROM Draws WHERE id = %d" % (drawID)
@@ -303,7 +306,6 @@ class MySQLEngine:
             
     def retrieveColorConfig(self):
         self.mysql_colorConfiguration = self.select("SELECT * FROM drawsConfig")
-
         return self.mysql_colorConfiguration[0]
         
         

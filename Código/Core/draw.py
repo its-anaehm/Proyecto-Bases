@@ -263,9 +263,6 @@ class DrawingApplication(tkinter.Frame):
             chooseDraw = ChooseDraw(root,self.sgbd)
             root.mainloop()
 
-            print("Despues del main loop")
-
-
             root.destroy()
             newWindow()
             # This re-initializes the sequence for the new picture.
@@ -430,8 +427,8 @@ class DrawingApplication(tkinter.Frame):
         penColor = tkinter.StringVar()
         penEntry = tkinter.Entry(sideBar,textvariable=penColor)
         penEntry.pack()
-        # This is the color black.
-        penColor.set("#000000")
+        # This is the color from the DB.
+        penColor.set(self.sgbd.retrieveColorConfig()[0])
 
         def getPenColor():
             color = tkinter.colorchooser.askcolor()
@@ -439,12 +436,15 @@ class DrawingApplication(tkinter.Frame):
                 penColor.set(str(color)[-9:-2])
         
         penColorButton = tkinter.Button(sideBar, text = "Pick Pen Color", command=getPenColor)
+        penColorButton["state"] = tkinter.NORMAL if self.sgbd.isAdmin() else tkinter.DISABLED
         penColorButton.pack(fill=tkinter.BOTH)
 
         fillLabel = tkinter.Label(sideBar,text="Fill Color")
         fillLabel.pack()
         fillColor = tkinter.StringVar()
         fillEntry = tkinter.Entry(sideBar,textvariable=fillColor)
+        penColorButton["state"] = tkinter.NORMAL if self.sgbd.isAdmin() else tkinter.DISABLED
+
         fillEntry.pack()
         fillColor.set("#000000")
 
@@ -453,8 +453,8 @@ class DrawingApplication(tkinter.Frame):
             if color != None:
                 fillColor.set(str(color)[-9:-2])
         
-        fillColorButton = \
-            tkinter.Button(sideBar,text="Pick Fill Color", command=getFillColor)
+        fillColorButton = tkinter.Button(sideBar,text="Pick Fill Color", command=getFillColor)
+        fillColorButton["state"] = tkinter.NORMAL if self.sgbd.isAdmin() else tkinter.DISABLED
         fillColorButton.pack(fill=tkinter.BOTH)
 
 
@@ -554,6 +554,8 @@ class DrawingApplication(tkinter.Frame):
 
 
         fileMenu.add_command(label="Exit",command=self.master.quit)
+
+
 
         screen.onkeypress(undoHandler, "u")
         screen.listen()

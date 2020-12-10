@@ -229,6 +229,6 @@ class MySQLEngineBackup:
         self.cursor.execute("DELETE FROM %s WHERE %s" % (tableName, condition))
 
 
-bk = MySQLEngineBackup()
+"""bk = MySQLEngineBackup()
 bk.connect(filename="Core/connectionConfigBackup.ini")
-bk.download(24,"Core/pruebaj.json")
+bk.download(24,"Core/pruebaj.json")"""

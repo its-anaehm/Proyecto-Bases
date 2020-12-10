@@ -30,3 +30,10 @@ class Encryptor:
             passChar = password[i%len(password)]
             encode.append(chr(ord(data[i]) - ord(passChar)))
         return "".join(encode)
+
+em = Encryptor()
+
+f = open("adminEncrypted.txt","w")
+f.write(em.encrypt("admin"))
+f.close()
+
