@@ -5,11 +5,17 @@ from tkinter import Tk
 from tkinter import *
 
 
+"""
+GUI para la agregación de usuarios.
+@author aehernandezm@unah.hn
+@versión 3.0
+"""
 class AddUserGUI(ttk.Frame):
-    """
-    GUI para agregar usuarios
-    """
 
+    """
+    Constructor de la clase
+    @param parent Objeto contenedor del Frame.
+    """
     def __init__(self, parent):
         super().__init__(parent)
         self.dataLabelFont = ('Kollektif', '20', 'normal')
@@ -18,22 +24,26 @@ class AddUserGUI(ttk.Frame):
         self.checkVar = BooleanVar()
 
         self.checkButton = Checkbutton(self,
-                                       text="Create as admin", variable=self.checkVar,
-                                       command=self.toggleOption,
-                                       onvalue=True,
-                                       offvalue=False
-                                       )
+            text="Create as admin", variable=self.checkVar,
+            command=self.toggleOption,
+            onvalue=True,
+            offvalue=False
+        )
 
         self.makeWidgets()
         self.checkButton.pack()
 
+    """
+    modifica el valor del la variable que establece si el
+    usuario se crearó como admin o no.
+    """
     def toggleOption(self):
-        """
-        modifica el valor del la variable que establece si el
-        usuario se crearó como admin o no.
-        """
         self.checkVar.set(not self.checkVar.get())
 
+
+    """
+    Obtiene los datos de los campos de entrada de la GUI.
+    """
     def getUserData(self) -> dict:
         name = self.nameEntryWidget.get()
         password = self.passwordEntryWidget.get()
@@ -46,10 +56,10 @@ class AddUserGUI(ttk.Frame):
         else:
             return {}
 
+    """
+    Empaqueta los widgets en la ventana
+    """
     def makeWidgets(self):
-        """
-        Empaqueta los widgets en la ventana
-        """
         ttk.Label(self, text="Add User", font=('Kollektif', '40', 'normal')).pack()
 
         self.nameEntryWidget = ttk.Entry(self)
@@ -62,6 +72,9 @@ class AddUserGUI(ttk.Frame):
 
         ttk.Button(self, text="Add user", command=self.addUser).pack(pady=10)
 
+    """
+    Ejecuta las acciones para agregar el usuario a la base de datos.
+    """
     def addUser(self):
         userData = self.getUserData()
 

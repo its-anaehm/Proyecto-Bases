@@ -1,9 +1,15 @@
+/*
+    @author: emilio.sosa@unah.hn
+    @date : 08/12/2020
+    @versión 1.0
+*/
+
 USE DBA;
 
 DELIMITER $$
 
     /*
-    
+        Trigger que registra una inserción de evento en la bicácora luego de que un usuario ha sido insertado en su respectiva tabla.
     */
     DROP TRIGGER IF EXISTS tg_binAddUser $$
     CREATE TRIGGER tg_binAddUser AFTER INSERT ON Users
@@ -17,6 +23,9 @@ DELIMITER $$
               );
         END $$
 
+    /*
+        Trigger registra en la bitácora la eliminación de un usuario.
+    */
     DROP TRIGGER IF EXISTS tg_binDeleteUser $$ 
     CREATE TRIGGER tg_binDeleteUser AFTER DELETE ON Users
         FOR EACH ROW
@@ -29,6 +38,9 @@ DELIMITER $$
             );
         END $$
     
+    /*
+        Trigger que registra una inserción de evento en la bicácora luego de que un usuario ha sido actualizado en su respectiva tabla.
+    */
     DROP TRIGGER IF EXISTS tg_binUpdateUser $$
     CREATE TRIGGER tg_binUpdateUser AFTER UPDATE ON Users
         FOR EACH ROW
@@ -39,20 +51,11 @@ DELIMITER $$
                     WHERE AES_ENCRYPT(((SUBSTRING_INDEX(CURRENT_USER(), "@",1))), "admin") = Us.var_user),
                 "Modificación de Usuario"
                 );
-        END $$
-
-    -- DROP TRIGGER IF EXISTS tg_binSelectUsers $$
-    -- CREATE TRIGGER tg_binSelectUsers AFTER SELECT ON Users
-    --     FOR EACH ROW
-    --     BEGIN
-    --         INSERT INTO Binnacle(userId, tex_event) VALUES(
-    --             (SELECT Us.id
-    --                 FROM Users Us
-    --                 WHERE ((SUBSTRING_INDEX(CURRENT_USER(), "@",1))) = Us.var_user),
-    --             "Selección y Visualización de Usuarios"
-    --             );
-    --     END $$
-
+        END $$    
+    
+    /*
+        Trigger que registra una inserción de evento en la bicácora luego de que un dibujo ha sido insertado en su respectiva tabla.
+    */
     DROP TRIGGER IF EXISTS tg_binAddDraw $$
     CREATE TRIGGER tg_binAddDraw AFTER INSERT ON Draws
         FOR EACH ROW
@@ -65,6 +68,9 @@ DELIMITER $$
                 );
         END $$
     
+    /*
+    Trigger que registra en la bitácora la eliminación de un dibujo.
+    */
     DROP TRIGGER IF EXISTS tg_binDeleteDraw $$    
     CREATE TRIGGER tg_binDeleteDraw AFTER DELETE ON Draws
         FOR EACH ROW
@@ -78,6 +84,9 @@ DELIMITER $$
                 );
         END $$
     
+    /*
+        Trigger que registra una inserción de evento en la bicácora luego de que un dibujo ha sido modificado en su respectiva tabla.
+    */
     DROP TRIGGER IF EXISTS tg_binModifyDraw $$ 
     CREATE TRIGGER tg_binModifyDraw AFTER UPDATE ON Draws
         FOR EACH ROW
@@ -106,6 +115,9 @@ DELIMITER $$
 
     --     END $$
 
+    /*
+        Trigger que registra una inserción de evento en la bicácora luego de que la configuración de color de un dibujo ha sido modificado en su respectiva tabla.
+    */
     DROP TRIGGER IF EXISTS tg_binModifyDrawConfig $$
     CREATE TRIGGER tg_binModifyDrawConfig AFTER UPDATE ON drawsConfig
         FOR EACH ROW
@@ -120,6 +132,9 @@ DELIMITER $$
 
         END $$    
 
+    /*
+        Trigger que encripta los nuevos datos agregados a la tabla de usuarios cuando detecta una insersión.
+    */
     DROP TRIGGER IF EXISTS tg_addCodedUser $$
     CREATE TRIGGER tg_addCodedUser BEFORE INSERT ON Users
         FOR EACH ROW
@@ -131,6 +146,9 @@ DELIMITER $$
             
         END $$
 
+    /*
+        Trigger que encripta los nuevos datos agregados a la tabla de usuarios cuando detecta una modificación.
+    */
     DROP TRIGGER IF EXISTS tg_updateCodedUser $$
     CREATE TRIGGER tg_updateCodedUser BEFORE UPDATE ON Users
         FOR EACH ROW
@@ -144,6 +162,9 @@ DELIMITER $$
             END IF;
         END $$
 
+    /*
+        Trigger que encripta los nuevos datos agregados a la tabla de dibujos cuando detecta una insersión.
+    */
     DROP TRIGGER IF EXISTS tg_addCodedDraw $$
     CREATE TRIGGER tg_addCodedDraw BEFORE INSERT ON Draws
         FOR EACH ROW
@@ -152,6 +173,9 @@ DELIMITER $$
             SET NEW.jso_drawInfo = AES_ENCRYPT(NEW.jso_drawInfo, "admin");
         END $$
 
+    /*
+        Trigger que encripta los nuevos datos agregados a la tabla de dibujos cuando detecta una modificación.
+    */
     DROP TRIGGER IF EXISTS tg_updateCodedDraw $$
     CREATE TRIGGER tg_updateCodedDraw BEFORE UPDATE ON Draws
         FOR EACH ROW
@@ -165,12 +189,13 @@ DELIMITER $$
             END IF;
         END $$
 
+    /*
+        Trigger que encripta los nuevos datos agregados a la tabla de configuración de colores de dibujo cuando detecta una modificación.
+    */
     DROP TRIGGER IF EXISTS tg_updateCodedColorConfiguration $$
     CREATE TRIGGER tg_updateCodedColorConfiguration BEFORE UPDATE ON Draws
         FOR EACH ROW
-        -- ? que es esto? entiendo
-        -- modificaciones encriptadas para las configuraciones de color 
-        -- penn color y fill color
+
         BEGIN
             IF OLD.var_penColor <> NEW.var_penColor THEN
                 SET NEW.var_penColor = AES_ENCRYPT(NEW.var_penColor, "admin");

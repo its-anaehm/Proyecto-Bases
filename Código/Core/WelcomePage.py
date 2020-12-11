@@ -10,7 +10,9 @@ class WelcomeGUI(ttk.Frame):
         self.pack()
         
 
-
+    """
+    Ejecuta la ventana de inicio de Sesión.
+    """
     def goToLoginPage(self):
         self.destroy()
         LoginGUI(self.master)

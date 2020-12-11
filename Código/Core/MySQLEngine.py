@@ -6,7 +6,7 @@ import configparser
 """
     @author: emilio.sosa@unah.hn
     @date: 2020/26/11
-    @version: 1.0
+    @version: 5.0
 """
 
 
@@ -53,33 +53,33 @@ class MySQLEngine:
                 print("Datos erróneos" , err)
                 return {"status":False, "message":"Wrong data", "ErrorData":err.errno}
             else:
-                print("Error de conexión")
-                print(err)
-                return {"status":False, "message":"Error", "ErrorData":err.errno}
+               print("Error de conexión")
+               print(err)
+               return {"status":False, "message":"Error", "ErrorData":err.errno}
     
+    """
+    Encargada de ejecutar querys en la base de datos.
+    @param query : Es la consulta que se manda a la base de datos para recuperar datos.
+    """
     def select(self, query:str) -> list:
-        """
-        Encargada de ejecutar querys en la base de datos.
-        :param q
-        """
         self.link.execute(query)
         return self.link.fetchall()
 
+    """
+    @function closeDataBase : Cierra la conexión con la base de datos.    
+    """
     def closeDataBase(self):
-        """
-        Cierra la conexión con la base de datos
-        """
         self.link.close()
         self.con.close()
 
         print("Connection ended.")
 
+    """
+    Se encarga de registrar en la bitácora el inicio de sesión de un usuario.
+    @param userName : Nombre de usuario que inició sesión.
+    @type userName: String.
+    """
     def userLoginRegister(self, userName:str):
-        """
-        Se encarga de registrar en la bitácora el inicio de sesión de un usuario.
-        :param userName: Nombre de usuario que inició sesión.
-        :type userName: String.
-        """
         try :
             self.mysql_register = "INSERT INTO Binnacle(userId, tex_event) VALUES((SELECT Us.id FROM Users Us WHERE AES_ENCRYPT('%s','%s') = Us.var_user), 'Inicio de Sesión')" % (userName,self.adminPass)
 
@@ -92,21 +92,19 @@ class MySQLEngine:
 
     
 
-    def addUser(self, userName:str, userPassword:str, admin:bool) -> bool:
- 
-        """
-        Método para agregar un usuario a la base de datos de usuarios y como
-        usuario del sistema de gestión de base de datos, tambien se encarga de establecer
-        los permisos adecuados para usuarios administradores y operadores.
-        :param userName: Nombre del usuario que se agregará a la tabla.
-        :type userName: String.
-        :param userPassword: Contraseña del usuario que se agregará a la tabla.
-        :type userPassword: String.
-        :param admin: True si el usuario se crea como admin. False si el usuario se crea como operador.
-        :type admin: bool.
-        """
+    """
+    Método para agregar un usuario a la base de datos de usuarios y como
+    usuario del sistema de gestión de base de datos, tambien se encarga de establecer
+    los permisos adecuados para usuarios administradores y operadores.
+    @param userName: Nombre del usuario que se agregará a la tabla.
+    @type userName: String.
+    @param userPassword: Contraseña del usuario que se agregará a la tabla.
+    @type userPassword: String.
+    @param admin: True si el usuario se crea como admin. False si el usuario se crea como operador.
+    @type admin: bool.
+    """
+    def addUser(self, userName:str, userPassword:str, admin:bool) -> bool: 
         try:
-
             self.mysql_create = "CREATE USER '%s'@'%s' IDENTIFIED BY '%s'" % (
                 userName, self.server, userPassword)
             self.link.execute(self.mysql_create)
@@ -143,12 +141,12 @@ class MySQLEngine:
             print("Inserción fallida {}".format(error.errno))
             return False            
 
+    """
+    Procedimiento ejecutado para eliminar un usuario.
+    @param userName: Nombre de usuario a eliminar.
+    @type userName: String
+    """
     def dropUser(self, userName) -> bool:
-        """
-        Procedimiento ejecutado para eliminar un usuario.
-        :param userName: Nombre de usuario a eliminar.
-        :type userName: String
-        """
         try:            
 
             self.mysql_sgbd = "DROP USER '%s'@'localhost'" % (userName)
@@ -165,10 +163,10 @@ class MySQLEngine:
             print("Eliminación fallida {}".format(error))
             return False
 
+    """
+    Devuelve una lista con el nombre de los usuarios
+    """
     def retrieveUsers(self) -> list:
-        """
-        Devuelve una lista con el nombre de los usuarios
-        """
         self.mysql_consult = self.select("SELECT AES_DECRYPT(var_user, '%s') FROM Users" % (self.adminPass)) 
         self.userArray= []
 
@@ -177,16 +175,16 @@ class MySQLEngine:
 
         return self.userArray
         
+    """
+    Modifica los atributos de un usuario de la base de datos.
+    @param userName: Nombre del usuario a editar.
+    @type userName: String.
+    @param newUserName: Nuevo nombre del usuario.
+    @type newUserName: String.
+    @param password: Nueva contraseña del usuario.
+    @type password: String.
+    """
     def alterUser(self, userName:str, newUserName:str=None, password:str=None) -> bool:
-        """
-        Modifica los atributos de un usuario de la base de datos.
-        :param userName: Nombre del usuario a editar.
-        :type userName: String.
-        :param newUserName: Nuevo nombre del usuario.
-        :type newUserName: String.
-        :param password: Nueva contraseña del usuario.
-        :type password: String.
-        """
         print("entro en función alter user = %s, newUser = %s, password=%s" % (userName, newUserName, password))
         try:
             
@@ -214,12 +212,12 @@ class MySQLEngine:
             print("Actualización de Usuario fallida. {}".format(error))
             return False
 
+    """
+    Almacena un dibujo nuevo en la base de datos.
+    @param drawName: Nombre del dibujo.
+    @param drawConfig: string que representa un json que es generado por el módulo de dibujo.
+    """
     def insertDraw(self, drawName:str, drawConfig:str) -> dict:
-        """
-        Almacena un dibujo nuevo en la base de datos.
-        :param drawName: Nombre del dibujo.
-        :param drawConfig: string que representa un json que es generado por el módulo de dibujo.
-        """
         self.mysql_nameExists = self.select(("SELECT id FROM Draws WHERE var_name = AES_ENCRYPT('%s','%s') and userId = %d") % (drawName, self.adminPass,self.mysql_userId))
         
         if self.mysql_nameExists:
@@ -232,11 +230,11 @@ class MySQLEngine:
             print("Dibujo insertado")
             return {"status":True, "message":"Draw inserted"}
 
+    """
+    Elimina un dibujo de la base de datos
+    @param drawId: Id del dibujo a eliminar
+    """
     def dropDraw(self, drawId) -> bool:
-        """
-        Elimina un dibujo de la base de datos
-        :param drawId: Id del dibujo a eliminar
-        """
         try:
             self.mysql_delete = "DELETE FROM Draws WHERE id = %d" % (drawId)
             self.link.execute(self.mysql_delete)
@@ -248,11 +246,11 @@ class MySQLEngine:
             print("Borrado de dibujo fallido. {}".format(error))
             return False
 
+    """
+    Modifica los datos que representan un dibujo en la base de datos.
+    @param drawId: Id de la base de datos
+    """
     def modifyDraw(self, drawId:int, drawJson):
-        """
-        Modifica los datos que representan un dibujo en la base de datos.
-        :param drawId: Id de la base de datos
-        """
         try:
             self.mysql_drawUpdate = "UPDATE Draws SET jso_drawInfo = '%s' WHERE id = %d" % (drawJson, drawId)
 
@@ -262,11 +260,11 @@ class MySQLEngine:
             print("Dibujo no se pudo modificar. {}".format(error))
 
 
+    """
+    Devuelve los registros correspondientes con dibujos
+    @param userName: Nombre de usuario dueño de los dibujos.
+     """
     def retrieveDraws(self):
-        """
-        Devuelve los registros correspondientes con dibujos
-        :param userName: Nombre de usuario dueño de los dibujos.
-        """
         try:            
             self.mysql_drawQuery = "SELECT id, AES_DECRYPT(var_name, %s), DATE(tim_time), TIME(tim_time) FROM Draws WHERE userId = %d" % (self.adminPass, self.mysql_userId)
             self.result = self.select(self.mysql_drawQuery)
@@ -278,39 +276,39 @@ class MySQLEngine:
         except mysql.connector.Error as error:
             print("No se han podido recuperar los dibujos {}".format(error))
     
+    """
+    Realiza querys a la base de datos para obtener información del usuario.
+    Establece en el atributo mysql_userId el id del usuario.
+    Establece en el atributo mysql_userCategory la categoria del usuario
+    @param userName: Nombre de usuario del cual se recuperaran los datos.
+        Este debe ser un usuario existente en la tabla de usuarios.
+    """
     def userData(self, userName) -> dict:
-        """
-        Realiza querys a la base de datos para obtener información del usuario.
-        Establece en el atributo mysql_userId el id del usuario.
-        Establece en el atributo mysql_userCategory la categoria del usuario
-        :param userName: Nombre de usuario del cual se recuperaran los datos.
-            Este debe ser un usuario existente en la tabla de usuarios.
-        """
         self.mysql_userId = self.select("SELECT id FROM Users WHERE var_user = AES_ENCRYPT('%s','%s')" % (userName, self.adminPass))[0][0]
         self.mysql_userCategory = self.select("SELECT AES_DECRYPT(var_category,'%s') FROM Users WHERE var_user = AES_ENCRYPT('%s','%s')" % (self.adminPass,userName, self.adminPass))[0][0]
         return {"id":self.mysql_userId, "category":self.mysql_userCategory}
         
     
+    """
+    Retorna si el usuario actual es administrador o no.
+    """
     def isAdmin(self) -> bool:
-        """
-        Retorna si el usuario actual es administrador o no.
-        """
         return self.mysql_userCategory == "Administrador"
 
+    """
+    Recupera desde la base de datos el JSON que representará un dibujo.
+    @param drawID: id que identifica el dibujo en la base de datos.
+    """
     def retrieveDrawJSON(self, drawID):
-        """
-        Recupera desde la base de datos el JSON que representará un dibujo.
-        :param drawID: id que identifica el dibujo en la base de datos.
-        """
         self.mysql_drawConfig = "SELECT AES_DECRYPT(jso_drawInfo, %s) FROM Draws WHERE id = %d" % (self.adminPass, drawID)
 
         self.result = self.select(self.mysql_drawConfig)
         return self.result[0][0]
 
+    """
+    Recupera desde la base de datos la información de la bitácora
+    """
     def retrieveBinnacleInfo(self) -> list:
-        """
-        Recupera desde la base de datos la información de la bitácora
-        """
         try:
             # ! Devolver el usuario en la primera posición
             self.mysql_binnacle = self.select("SELECT AES_DECRYPT(Users.var_user, '%s'), tex_event, DATE(tim_time), TIME(tim_time) FROM Binnacle JOIN Users ON Binnacle.userId = Users.id" % self.adminPass) 
@@ -318,12 +316,12 @@ class MySQLEngine:
         except mysql.connector.Error as error:
             print("No se puedieron recuperar los registros de bitácora. {}".format(error))
 
+    """
+    Guarda la configuracioón de dibujo en la base de datos.
+    @param pennColor: string que representa un número hexadecimal para el penColor.
+    @param fillColor: string que representa un número hexadecimal que será usado para el fillColor.
+    """
     def updateDrawConfiguration(self, pennColor=None, fillColor=None):
-        """
-        Guarda la configuracioón de dibujo en la base de datos.
-        :param pennColor: string que representa un número hexadecimal para el penColor.
-        :param fillColor: string que representa un número hexadecimal que será usado para el fillColor.
-        """
         if pennColor:
             self.mysql_config = "UPDATE drawsConfig SET var_penColor = %s" % (pennColor)
 
@@ -336,11 +334,11 @@ class MySQLEngine:
             self.link.execute(self.mysql_config)
             self.con.commit()
             
+    """
+    Recupera la configuración de dibujo (pen color y fill color) almacenada en
+    la base de datos.
+    """
     def retrieveColorConfig(self) -> tuple:
-        """
-        Recupera la configuración de dibujo (pen color y fill color) almacenada en
-        la base de datos.
-        """
         self.mysql_colorConfiguration = self.select("SELECT * FROM drawsConfig")
         return self.mysql_colorConfiguration[0]
         

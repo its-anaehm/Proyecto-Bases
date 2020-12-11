@@ -5,24 +5,29 @@ from tkinter import Tk
 from tkinter import *
 
 
+"""
+GUI para eliminar usuarios
+@author mdomgeza@unah.hn
+@version 4.1
+"""
 class DropUserGUI(ttk.Frame):
     """
-    GUI para eliminar usuarios
+    Construcctor de la clase.
+    @param parent: Objeto que funcion como master para el frame que representa la clase.
+    @param sgbd: Objeto de tipo MySQLEngine utilizado para ejecutar acciones con la base de datos.
     """
     def __init__(self,parent, sgbd: MySQLEngine):
-        """
-        :param parent: Objeto padre del frame que representa la clase.
-        """
+
         super().__init__(parent)
         self.sgbd = sgbd
         self.userList = Listbox(self, selectmode=SINGLE)
         self.makeWidgets()
         self.pack(padx=20, pady=20)
 
+    """
+    Crea y empaqueta los elementos en la ventana.
+    """
     def makeWidgets(self) -> None:
-        """
-        Crea y empaqueta los elementos en la ventana.
-        """
         ttk.Label(self,text="Drop User", font=('Kollektif', '30', 'normal')).pack()
 
         self.fillUserList()
@@ -30,19 +35,19 @@ class DropUserGUI(ttk.Frame):
         self.userList.pack()
         ttk.Button(self,text="Drop User", command=self.drop).pack(padx=10, pady=10)
 
+    """
+    Llena la lisbox con los nombres de los usuarios
+    """
     def fillUserList(self):
-        """
-        Llena la lisbox con los nombres de los usuarios
-        """
         users = self.getUsers()
         if users:
             for index in range(len(users)):
                 self.userList.insert(index +1, users[index])
 
+    """
+    Elimina el usuario selecionado
+    """
     def drop(self) -> None:
-        """
-        Elimina el usuario selecionado
-        """
         name = self.userList.get(self.userList.curselection())
         if self.sgbd.dropUser(name[0]):
             self.userList.delete(0,'end')
@@ -51,9 +56,9 @@ class DropUserGUI(ttk.Frame):
         else:
             messagebox.showerror(title="Error to drop user",message="Something went wrong to drop the user. Call support")
 
+    """
+    Ejecuta un query para obtener el nombre de los usuarios.
+    """
     def getUsers(self):
-        """
-        Ejecuta un query para obtener el nombre de los usuarios.
-        """
         query = "SELECT AES_DECRYPT(var_user,'%s') FROM Users" % self.sgbd.adminPass
         return self.sgbd.select(query)

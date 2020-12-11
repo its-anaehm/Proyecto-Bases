@@ -3,7 +3,16 @@ from tkinter import TkVersion, ttk
 from tkinter import Tk
 from typing import ValuesView
 
+"""
+GUI que muestra los registros de la bitácora.
+"""
 class BinnacleGUI(ttk.Frame):
+
+    """
+    Constructor de la clase.
+    @param parent: Contenedor del Frame que representa la clase.
+    @param sbgd: Objeto MySQLEngine que es utilizado para ejecutar acciones con la base de datos.
+    """
     def __init__(self, parent, sgbd):
         super().__init__(parent)
         self.sgbd = sgbd
@@ -21,6 +30,9 @@ class BinnacleGUI(ttk.Frame):
 
         self.fillTreeView()
 
+    """
+    Ejecuta obtiene los registros de la bitácora y los imprime en la GUI.
+    """
     def fillTreeView(self):
         for draw in self.sgbd.retrieveBinnacleInfo():
             self.treeView.insert('','end',values=draw)

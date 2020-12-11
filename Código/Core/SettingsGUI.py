@@ -9,7 +9,20 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import Tk
 import tkinter.colorchooser
+
+"""
+Objeto que se renderiza como la pantalla de configuración
+@autor mdgomeza@unah.hn
+@version 2.1
+"""
 class SettingsGUI(ttk.Frame):
+
+    """
+    Constructor de la clase
+    @param parent Master del frame que representa la ventana.
+    @param sgbd Objeto de tipo MySQLEngine utilizado para realizar
+        operaciones con la base de datos.
+    """
     def __init__(self, parent, sgbd):
         super().__init__(parent)
         self.pack(padx=20, pady=20)
@@ -30,10 +43,17 @@ class SettingsGUI(ttk.Frame):
         ttk.Button(self,text="Delete User",command=self.deleteUser).pack(padx=10,pady=10,fill=tkinter.BOTH)
         ttk.Button(self,text="Log registred data",command=self.getBinnacle).pack(padx=10,pady=10,fill=tkinter.BOTH)
 
+
+    """
+    Inicia la ejecución de la pantalla que muestra la bitácora.
+    """
     def getBinnacle(self):
         BinnacleGUI(self.master,self.sgbd)
         self.destroy()
 
+    """
+    Inicia la ejecución de la pantalla para agregar usuarios.
+    """
     def addUser(self):
         root2 = Tk()
         root2.title("Add User")
@@ -41,18 +61,27 @@ class SettingsGUI(ttk.Frame):
         addUserGUI.sgbd = self.sgbd
         root2.mainloop()
 
+    """
+    Inicia la ejecución de la pantalla para alterar usuarios.
+    """
     def alterUser(self):
         root = Tk()
         root.title("Change user values")
         ChoseUserToAlterGUI(root, self.sgbd)
         root.mainloop()
 
+    """
+    Inicia la ejecución de la pantalla para alterar usuarios.
+    """
     def deleteUser(self):
         root = Tk()
         root.title("Drop User")
         dropUserGui = DropUserGUI(root,self.sgbd)
         root.mainloop()
 
+    """
+    Inicia la ejecución de la pantalla para cambiar el color del lapiz.
+    """
     def changePenColor(self):
         color = tkinter.colorchooser.askcolor()
         if color[0] != None:
@@ -64,6 +93,9 @@ class SettingsGUI(ttk.Frame):
             except mysql.connector.Error as error:
                 print("La configuración no pudo aplicarse, {}".format(error))
 
+    """
+    Inicia la ejecución de la pantalla para cambiar el fill color.
+    """
     def changeFillColor(self):
         color = tkinter.colorchooser.askcolor()
         if color[0] != None:

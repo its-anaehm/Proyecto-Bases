@@ -2,7 +2,18 @@ from tkinter import ttk
 from tkinter import Tk
 from tkinter import *
 
+
+"""
+GUI que muestra dibujos almacenados en la base de datos.
+@author mdgomeza@unah.hn
+@version 4.2
+"""
 class LoadDrawGUI(ttk.Frame):
+    """
+    Constructor de la clase.
+    @param parent: Objeto master contenedor del frame.
+    @param dta
+    """
     def __init__(self, parent, data=None):
         super().__init__(parent)
         self.draws = self.getDraws()
@@ -14,7 +25,10 @@ class LoadDrawGUI(ttk.Frame):
         self.makeWidgets(self.data)
 
         self.pack(pady=20, padx=20)
-
+    
+    """
+    Obtiene un usuario junto a su dibujo y el nombre del mismo.
+    """
     def getDraws(self):
         return ('User', 'Name',"Data")*20
 
@@ -34,6 +48,9 @@ class LoadDrawGUI(ttk.Frame):
 
         ttk.Button(self, text="Get", command=self.getCurrent).pack()
 
+    """
+    Obtiene el dibujo
+    """
     def getCurrent(self):
         self.selection =  self.data[self.listDraw.curselection()[0]]
         self.master.destroy()

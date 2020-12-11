@@ -1,6 +1,17 @@
+/*
+    @author: emilio.sosa@unah.hn
+    @date : 08/12/2020
+    @versión 1.0
+*/
+
+
 USE DBA;
 
 DELIMITER $$
+
+    /*
+        Procedimiento almacenado que agrega al usuario administrador por defecto.
+    */
     DROP PROCEDURE IF EXISTS sp_addMainUser $$
     CREATE PROCEDURE sp_addMainUser(IN category VARCHAR(50))
         BEGIN
@@ -12,6 +23,10 @@ DELIMITER $$
         
         END $$
 
+    /*
+        Procedimiento que encripta los datos pasados en primer parámetro con la contraseña en el segundo parámetro, 
+        y los almacena en el tercer parámetro.
+    */
     DROP PROCEDURE IF EXISTS sp_encrypt $$
     CREATE PROCEDURE sp_encrypt (IN textToEncrypt TEXT, IN pass VARCHAR(100), OUT encryptedData VARCHAR(200))
         BEGIN
@@ -38,7 +53,10 @@ DELIMITER $$
 
         END $$
 
-
+    /*
+        Procedimiento que encripta los datos pasados en primer parámetro con la contraseña en el segundo parámetro, 
+        y los almacena en el tercer parámetro.
+    */
     DROP PROCEDURE IF EXISTS sp_decrypt $$
     CREATE PROCEDURE sp_decrypt (IN textToEncrypt TEXT, IN pass VARCHAR(100), OUT encryptedData VARCHAR(200))
         BEGIN
@@ -64,7 +82,9 @@ DELIMITER $$
             SET encryptedData = @encode;
 
         END $$
-
+    /*
+        Encripta datos utilizando funciones build-in de mariadb.
+    */
     DROP PROCEDURE IF EXISTS sp_encryption $$
     CREATE PROCEDURE sp_encryption(IN textToEncrypt TEXT, OUT encryptedData TEXT)
         BEGIN
@@ -73,6 +93,9 @@ DELIMITER $$
 
         END $$
 
+    /*
+        Desencripta datos usando funciones build-in de mariadb.
+    */
     DROP PROCEDURE IF EXISTS sp_decryption $$
     CREATE PROCEDURE sp_decryption(IN textToDecrypt TEXT, OUT decryptedData TEXT)
         BEGIN

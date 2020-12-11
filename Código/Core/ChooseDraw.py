@@ -5,10 +5,17 @@ from tkinter import Tk
 from typing import ValuesView
 from Core.Encryptor import Encryptor
 
-
+"""
+GUI que muestra los dibujos y permite realizar una selección.
+@author mdgomeza@unah.hn
+@version 2.0
+"""
 class ChooseDraw(ttk.Frame):
     """
-    GUI que muestra datos de los dibujos
+    Constructor del objeto.
+    @param parent: Objeto master del frame.
+    @param sgbd: Objeto MySQLEngine para ejecutar acciones con la base de datos.
+    @param function: String que será el titulo de la ventana
     """
     def __init__(self, parent, sgbd, function=None):
         super().__init__(parent)
@@ -31,12 +38,18 @@ class ChooseDraw(ttk.Frame):
 
         ttk.Button(self,text="Choose Draw",command=self.getSelected).pack()
     
+    """
+    Recupera información de la base de datos y los introduce en el objeto treeView.
+    """
     def fillTreeView(self):
         encryptor = Encryptor()
         for draw in self.sgbd.retrieveDraws():
             draw[1] = encryptor.decrypt(draw[1])
             self.treeView.insert('','end',values=draw)
-
+    """
+    Establece como atributo la selección del usuario y destruye la 
+    renderización de la ventana.
+    """
     def getSelected(self):
         self.itemID = self.treeView.item(self.treeView.selection()[0])["values"][0]
         self.itemName = self.treeView.item(self.treeView.selection()[0])["values"][1]

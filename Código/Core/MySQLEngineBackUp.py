@@ -9,24 +9,29 @@ import mysql
 import mysql.connector as DBCon
 import configparser
 
+"""
+Objeto utilizado como interfaz entre la
+base de datos B y algún programa.
+@author leonardo.mass@unah.hn
+@version 5.1
+"""
 class MySQLEngineBackup:
+
     """
-    Objeto utilizado como interfaz entre la
-    base de datos y algún programa.
+    Constructor de la clase.
     """
     def __init__(self):
         self.connection = None
         self.cursor = None
 
 
-    def connect(self, **conectionData) -> bool:
-        """
-        abrir una conexión con la base de datos
+    """
+    abrir una conexión con la base de datos
 
-        args:
-            filename  Nombre de archivo de configuración. Opcional
-            contectionData  datos necesarios para iniciar una conexión.
-        """
+    @param filename  Nombre de archivo de configuración. Opcional
+    @param contectionData  datos necesarios para iniciar una conexión.
+    """
+    def connect(self, **conectionData) -> bool:
         try:
             data = {}
             if "filename" in conectionData:
@@ -52,11 +57,14 @@ class MySQLEngineBackup:
             return False
 
 
+    """
+    Datos dos diccionarios de datos solo toma los necesarios
+    para la conexión y revisa que esten todos.
+
+    @param data1 diccionario de que contiene datos de conexión.
+    @param data2 Diccionario de datos de conexión.
+    """
     def purgeData(self, data1, data2 = {}) -> dict:
-        """
-        Datos dos diccionarios de datos solo toma los necesarios
-        para la conexión y revisa que esten todos.
-        """
         neededData = ["host","port","user","password","database"]
         verifiedData = {}
 
@@ -73,27 +81,40 @@ class MySQLEngineBackup:
         return verifiedData
 
 
+    """       
+    Lee la configuración de un archivo dado
+    @param filename: Archivo de datos de configuración
+    @type: String
+    @param section: Sección del archivo de configuración donde estan ubicados elementos de conexión.
+    @type: String
+    """
     def readConfigFile(self, filename:str, section:str='DEFAULT') -> dict:
-        """
-            Lee la configuración de un archivo dado
-        """
         config = configparser.ConfigParser()
         config.read(filename)
         return dict(config[section])
 
+    """
+    Ejecuta una query
+    @param query : Cadena que representa sentencias de correctas de mysql.
+    """
     def execute(self, query):
-        """
-        Ejecuta una query
-        :param query: Cadena que representa sentencias de correctas de mysql.
-        """
         return self.cursor.execute(query)
 
-    def getResult(self):
-        """
-        Obtiene el resultado de la última query ejecutada
-        """
+    """
+    Obtiene el resultado de la última query ejecutada
+    """
+    def getResult(self) -> list:
         return self.cursor.fetchall()
 
+    """
+    Inserta un dibujo en la base de datos de respaldo.
+    @param userId: Id del usuario que creó el dibujo.
+    @trype String
+    @param drawName: Nombre del dibujo.
+    @type String
+    @param drawJSON: String en formato JSON que representa el dibujo.
+    @type String
+    """
     def insertDraw(self, userId, drawName, drawJSON):
         self.cursor.execute(
             "SELECT * FROM Draws WHERE var_name = %s and userId = %s",
@@ -137,6 +158,11 @@ class MySQLEngineBackup:
             print("Dibujo insertado")
             return {"status": True, "message": "Draw inserted"}
 
+    """
+    Elimina un dibujo de la base de datos.
+    @param userId : Identificador de usuario en la base de datos.
+    @param drawName : Nombre del dibujo a eliminar.
+    """
     def deleteDraw(self, userId, drawName):
         try:
             self.cursor.execute(
@@ -150,7 +176,12 @@ class MySQLEngineBackup:
         except mysql.connector.Error as error:
             print("Borrando de dibujo. {}".format(error))
             return {"status":False, "message":"Fail F"}
-
+    
+    """
+    Borra todos los dibujos de un usuario.
+    @param userId: El id que identifica el usuario del cual se eliminarán los dibujos.
+    @type String
+    """
     def deleteAllUserDraws(self, userId):
         try:
             self.cursor.execute(
@@ -165,7 +196,15 @@ class MySQLEngineBackup:
             print("Borrando de dibujo. {}".format(error))
             return {"status":False, "message":"Fail F"}
         
-
+    """
+    Modifica un dibujo de la base de datos de respaldo.
+    @param userId: El id del usuario dueño del dibujo a modificar.
+    @type String
+    @param drawName: El nombre del dibujo a eliminar.
+    @type String
+    @param drawJSON: JSON del dibujo a modificar.
+    @type JSON
+    """
     def modifyDraw(self, userId, drawName, drawJSON):
         try:
             self.cursor.execute(
@@ -178,12 +217,15 @@ class MySQLEngineBackup:
             return {"status":True, "message":"Draw updated"}
 
         except mysql.connector.Error as error:
-            return {"status":False, "message":"Fail updated"}
+            return {"status":False, "message":"Fail updated", "error":error}
 
+    """
+    Descarga los dibujos del usuario.
+    @param drawId: Id del dibujo a descarar.
+    @type int
+    @param path: Ruta del dibujo.
+    """
     def download(self, drawId:int, path:str):
-        """
-        Descarga los dibujos del usuario.
-        """
         
         self.cursor.execute(
             "SELECT blo_drawInfo FROM Draws WHERE id = %s",
@@ -199,32 +241,15 @@ class MySQLEngineBackup:
         f.write(r[0][0])
 
         f.close()
-
-
         """
         for i in r:
     	    data = i[0] # this is the binary from database
         with open(fn,"wb") as f:
 	        f.write(data)
         f.close()
-        """
-        
+        """        
         subprocess.call(['gzip', '-d', fn])  #descomprime el archivo
 
-
-    def insertInto(self, tableName:str, fields:list, values:list):
-        """
-
-        """
-        fields = ",".join("%s" % x for x in fields)
-        values = ",".join("%s" % str(x) for x in values)
-
-        print("INSERT INTO %s(%s) VALUES %s;" % (tableName, fields, values))
-        self.cursor.execute("INSERT INTO %s(%s) VALUES %s;" % (tableName, fields, values))
-
-    def delete(self,tableName, condition):
-        print("DELETE FROM %s WHERE %s" % (tableName, condition))
-        self.cursor.execute("DELETE FROM %s WHERE %s" % (tableName, condition))
 
 
 """bk = MySQLEngineBackup()
