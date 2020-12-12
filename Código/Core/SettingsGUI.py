@@ -1,6 +1,6 @@
 from Core.DropUserGUI import DropUserGUI
 from Core.AddUserGUI import AddUserGUI
-from Core.AlterUserGUI import ChoseUserToAlterGUI
+from Core.AlterUserGUI import ChooseUserToAlterGUI
 from Core.BinnacleGUI import BinnacleGUI
 from Core.MySQLEngine import *
 
@@ -67,7 +67,7 @@ class SettingsGUI(ttk.Frame):
     def alterUser(self):
         root = Tk()
         root.title("Change user values")
-        ChoseUserToAlterGUI(root, self.sgbd)
+        ChooseUserToAlterGUI(root, self.sgbd)
         root.mainloop()
 
     """

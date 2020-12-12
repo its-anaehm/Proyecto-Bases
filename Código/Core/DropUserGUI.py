@@ -62,7 +62,9 @@ class DropUserGUI(ttk.Frame):
     """
     def drop(self) -> None:
         name = self.userList.get(self.userList.curselection())
-        if self.sgbd.dropUser(name[0]):
+        if name == "admin":
+            messagebox.showinfo(title="You can't delete the admin.", message="%s was deleted" % name[0])
+        elif self.sgbd.dropUser(name[0]):
             self.userList.delete(0,'end')
             self.fillUserList()
             backup = MySQLEngineBackup(self.sgbd)

@@ -13,7 +13,7 @@ GUI para seleccionar el usuario a alterar
 @author mdgomeza@unah.hn
 @version 2.0
 """
-class ChoseUserToAlterGUI(ttk.Frame):
+class ChooseUserToAlterGUI(ttk.Frame):
 
     """
     Constructor de la clase.
@@ -27,7 +27,7 @@ class ChoseUserToAlterGUI(ttk.Frame):
         self.master.title("Alter user")
         self.sgbd:MySQLEngine = sgbd
 
-        ttk.Label(self,text="Chose an User", font=('Kollektif', '30', 'normal')).pack()
+        ttk.Label(self,text="Choose an User", font=('Kollektif', '30', 'normal')).pack()
 
         self.userList = Listbox(self, selectmode=SINGLE)
         self.users = []
