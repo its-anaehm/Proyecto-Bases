@@ -37,9 +37,9 @@ CREATE TABLE drawsConfig(
 ) COMMENT "Tabla que guarda los datos que se configuran para las opciones de FillColor y PenColor.";
 
 CREATE TABLE Binnacle(
-    id INT AUTO_INCREMENT PRIMARY KEY "Llave identificadora del evento.",
+    id INT AUTO_INCREMENT PRIMARY KEY COMMENT "Llave identificadora del evento.",
     userId INT NOT NULL COMMENT "Identificador del usuario que disparó el evento.",
-    tex_event TEXT NOT NULL, COMMENT "Texto que describe el evento."
+    tex_event TEXT NOT NULL COMMENT "Texto que describe el evento.",
     tim_time TIMESTAMP DEFAULT NOW() COMMENT "Momento en que se almacenó el registro del evento.",
 
     FOREIGN KEY (userId)

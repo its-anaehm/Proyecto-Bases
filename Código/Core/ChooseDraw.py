@@ -42,9 +42,7 @@ class ChooseDraw(ttk.Frame):
     Recupera información de la base de datos y los introduce en el objeto treeView.
     """
     def fillTreeView(self):
-        encryptor = Encryptor()
         for draw in self.sgbd.retrieveDraws():
-            draw[1] = encryptor.decrypt(draw[1])
             self.treeView.insert('','end',values=draw)
     """
     Establece como atributo la selección del usuario y destruye la 

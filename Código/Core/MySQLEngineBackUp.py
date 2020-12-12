@@ -5,6 +5,8 @@ import subprocess
 from tkinter import *
 from tkinter import filedialog, messagebox
 
+from Core.Encryptor import Encryptor
+
 import mysql
 import mysql.connector as DBCon
 import configparser
@@ -20,9 +22,10 @@ class MySQLEngineBackup:
     """
     Constructor de la clase.
     """
-    def __init__(self):
+    def __init__(self, sgbd):
         self.connection = None
         self.cursor = None
+        self.sgbd = sgbd
 
 
     """
@@ -117,8 +120,8 @@ class MySQLEngineBackup:
     """
     def insertDraw(self, userId, drawName, drawJSON):
         self.cursor.execute(
-            "SELECT * FROM Draws WHERE var_name = %s and userId = %s",
-            (drawName, userId)
+            "SELECT * FROM Draws WHERE var_name = AES_ENCRYPT(%s,%s) and userId = %s",
+            (drawName, self.sgbd.adminPass, userId)
         )
         result = self.cursor.fetchall()
         self.connection.commit()
@@ -130,10 +133,11 @@ class MySQLEngineBackup:
 
         else:
             self.connection
+            encryptor = Encryptor()
             
             fileAbsPath = os.path.join(os.path.abspath("."), "%s.json" % drawName)
             f = open(fileAbsPath, "w")  # Se guardará como un archivo .json
-            f.write(drawJSON)
+            f.write(encryptor.encrypt(drawJSON, self.sgbd.adminPass))
             f.close()
 
             # Comprime la el archivo en formato .gz mediante la terminal
@@ -146,14 +150,17 @@ class MySQLEngineBackup:
             data = f.read()  # Lee los bits del archivo comprimido
             f.close()
             # Guarda los bits en la base de datos
+            encryptor = Encryptor()
             self.cursor.execute(
                 "INSERT INTO Draws(userId, var_name, blo_drawInfo) VALUES (%s, %s, %s)",
                 (userId, drawName, data)
-            )
+                )
+            
 
             self.connection.commit()
 
-            # subprocess.call(['rm', compressedFilePath])
+            subprocess.call(['rm', compressedFilePath])
+            subprocess.call(['rm', fileAbsPath])
 
             print("Dibujo insertado")
             return {"status": True, "message": "Draw inserted"}
@@ -166,8 +173,8 @@ class MySQLEngineBackup:
     def deleteDraw(self, userId, drawName):
         try:
             self.cursor.execute(
-                "DELETE FROM Draws WHERE userId = %s and var_name = %s",
-                (userId, drawName)
+                "DELETE FROM Draws WHERE userId = %s and var_name = AES_ENCRYPT(%s,%s)",
+                (userId, drawName, self.sgbd.adminPass)
             )
             self.connection.commit()
             print("Dibujo eliminado de B")
@@ -207,9 +214,10 @@ class MySQLEngineBackup:
     """
     def modifyDraw(self, userId, drawName, drawJSON):
         try:
+            encryptor = Encryptor()
             self.cursor.execute(
-                "UPDATE Draws SET blo_drawInfo = %s WHERE userId = %s and var_name = %s",
-                (drawJSON, userId, drawName)
+                "UPDATE Draws SET blo_drawInfo = %s WHERE userId = %s and var_name = AES_ENCRYPT(%s,%s)",
+                (encryptor.encrypt(drawJSON, self.sgbd.adminPass), userId, drawName, self.sgbd.adminPass)
             )
             self.connection.commit()
 
@@ -223,32 +231,40 @@ class MySQLEngineBackup:
     Descarga los dibujos del usuario.
     @param drawId: Id del dibujo a descarar.
     @type int
-    @param path: Ruta del dibujo.
     """
-    def download(self, drawId:int, path:str):
+    def download(self, drawId:int):
         
         self.cursor.execute(
             "SELECT blo_drawInfo FROM Draws WHERE id = %s",
+            #"SELECT blo_drawInfo FROM Draws WHERE id = %s",
             (drawId, )
         )
-        
         fn = filedialog.asksaveasfilename(initialdir=os.getcwd(), title="Save File")
-        fn = "%s.json.gz" % fn
+
+        fn = "%s.json" % fn
+        fnc = "%s.gz" % fn
+
         r = self.cursor.fetchall()
 
-        f = open(fn, "wb")
+        print("Esto es r",r)
+
+        f = open(fnc, "wb")
 
         f.write(r[0][0])
 
         f.close()
-        """
-        for i in r:
-    	    data = i[0] # this is the binary from database
-        with open(fn,"wb") as f:
-	        f.write(data)
+     
+        subprocess.call(['gzip', '-d', fnc])  #descomprime el archivo
+
+        encryptor = Encryptor()
+
+        f = open(fn,"r")
+        content = encryptor.decrypt(f.read(),self.sgbd.adminPass)
         f.close()
-        """        
-        subprocess.call(['gzip', '-d', fn])  #descomprime el archivo
+
+        f = open(fn,"w")
+        f.write(content)
+        f.close()
 
 
 

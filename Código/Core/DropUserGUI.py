@@ -1,4 +1,5 @@
 from Core.MySQLEngine import MySQLEngine
+from Core.MySQLEngineBackUp import MySQLEngineBackup
 from tkinter import messagebox
 from tkinter import ttk
 from tkinter import Tk
@@ -39,10 +40,22 @@ class DropUserGUI(ttk.Frame):
     Llena la lisbox con los nombres de los usuarios
     """
     def fillUserList(self):
-        users = self.getUsers()
-        if users:
-            for index in range(len(users)):
-                self.userList.insert(index +1, users[index])
+        self.users = self.getUsers()
+        if self.users:
+            for index in range(len(self.users)):
+                self.userList.insert(index +1, self.users[index][1])
+
+    """
+    Retorna el id del usuario.
+    @param name nombre del usuario
+    """
+    def getId(self, name):
+        for user in self.users:
+            if user[1] == name:
+                return user[0]
+        return -1
+
+
 
     """
     Elimina el usuario selecionado
@@ -52,6 +65,9 @@ class DropUserGUI(ttk.Frame):
         if self.sgbd.dropUser(name[0]):
             self.userList.delete(0,'end')
             self.fillUserList()
+            backup = MySQLEngineBackup(self.sgbd)
+            backup.connect(filename = "Core/connectionConfigBackup.ini")
+            backup.deleteAllUserDraws(self.getId(name[0]))
             messagebox.showinfo(title="User succesfully deleted", message="%s was deleted" % name[0])
         else:
             messagebox.showerror(title="Error to drop user",message="Something went wrong to drop the user. Call support")
@@ -60,5 +76,5 @@ class DropUserGUI(ttk.Frame):
     Ejecuta un query para obtener el nombre de los usuarios.
     """
     def getUsers(self):
-        query = "SELECT AES_DECRYPT(var_user,'%s') FROM Users" % self.sgbd.adminPass
+        query = "SELECT id, AES_DECRYPT(var_user,'%s') FROM Users" % self.sgbd.adminPass
         return self.sgbd.select(query)

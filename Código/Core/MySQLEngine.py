@@ -1,7 +1,8 @@
-
+# -*- coding:utf-8 -*-
 import mysql.connector
 from mysql.connector import Error
 import configparser
+from Core.Encryptor import *
 
 """
     @author: emilio.sosa@unah.hn
@@ -218,14 +219,15 @@ class MySQLEngine:
     @param drawConfig: string que representa un json que es generado por el módulo de dibujo.
     """
     def insertDraw(self, drawName:str, drawConfig:str) -> dict:
-        self.mysql_nameExists = self.select(("SELECT id FROM Draws WHERE var_name = AES_ENCRYPT('%s','%s') and userId = %d") % (drawName, self.adminPass,self.mysql_userId))
+        self.mysql_nameExists = self.select(("SELECT id FROM Draws WHERE var_name = AES_ENCRYPT('%s','%s') and userId = %d") % (drawName, self.adminPass, self.mysql_userId))
         
         if self.mysql_nameExists:
             return {"status":False, "message":"Draw already exist.", "drawId":self.mysql_nameExists[0][0]}
 
         else:
             self.mysql_insert = "INSERT INTO Draws(userId, var_name, jso_drawInfo) VALUES (%s, %s, %s)"
-            self.link.execute(self.mysql_insert,(self.mysql_userId, drawName, drawConfig))
+            encrypt = Encryptor()
+            self.link.execute(self.mysql_insert,(self.mysql_userId, drawName, encrypt.encrypt(drawConfig, self.adminPass)))
             self.con.commit()
             print("Dibujo insertado")
             return {"status":True, "message":"Draw inserted"}
@@ -266,7 +268,7 @@ class MySQLEngine:
      """
     def retrieveDraws(self):
         try:            
-            self.mysql_drawQuery = "SELECT id, AES_DECRYPT(var_name, %s), DATE(tim_time), TIME(tim_time) FROM Draws WHERE userId = %d" % (self.adminPass, self.mysql_userId)
+            self.mysql_drawQuery = "SELECT id, AES_DECRYPT(var_name, '%s'), DATE(tim_time), TIME(tim_time) FROM Draws WHERE userId = %d" % (self.adminPass, self.mysql_userId)
             self.result = self.select(self.mysql_drawQuery)
 
             return self.result
@@ -300,10 +302,11 @@ class MySQLEngine:
     @param drawID: id que identifica el dibujo en la base de datos.
     """
     def retrieveDrawJSON(self, drawID):
-        self.mysql_drawConfig = "SELECT AES_DECRYPT(jso_drawInfo, %s) FROM Draws WHERE id = %d" % (self.adminPass, drawID)
+        self.mysql_drawConfig = "SELECT jso_drawInfo FROM Draws WHERE id = %d" % (drawID)
 
         self.result = self.select(self.mysql_drawConfig)
-        return self.result[0][0]
+        decrypt = Encryptor()
+        return decrypt.decrypt(self.result[0][0], self.adminPass)
 
     """
     Recupera desde la base de datos la información de la bitácora
@@ -342,5 +345,5 @@ class MySQLEngine:
         self.mysql_colorConfiguration = self.select("SELECT * FROM drawsConfig")
         return self.mysql_colorConfiguration[0]
         
-        
+    
 

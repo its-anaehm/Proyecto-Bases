@@ -1,3 +1,4 @@
+#-*- coding:utf8 -*-
 from tkinter import Canvas, Image, PhotoImage, ttk
 import tkinter
 from tkinter.constants import NW

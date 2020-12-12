@@ -169,8 +169,8 @@ DELIMITER $$
     CREATE TRIGGER tg_addCodedDraw BEFORE INSERT ON Draws
         FOR EACH ROW
         BEGIN
-            SET NEW.var_name = AES_ENCRYPT(NEW.var_name, "admin");
-            SET NEW.jso_drawInfo = AES_ENCRYPT(NEW.jso_drawInfo, "admin");
+            SET NEW.var_name = AES_ENCRYPT(NEW.var_name, 'admin');
+            -- SET NEW.jso_drawInfo = AES_ENCRYPT(NEW.jso_drawInfo, "admin");
         END $$
 
     /*
@@ -193,7 +193,7 @@ DELIMITER $$
         Trigger que encripta los nuevos datos agregados a la tabla de configuración de colores de dibujo cuando detecta una modificación.
     */
     DROP TRIGGER IF EXISTS tg_updateCodedColorConfiguration $$
-    CREATE TRIGGER tg_updateCodedColorConfiguration BEFORE UPDATE ON Draws
+    CREATE TRIGGER tg_updateCodedColorConfiguration BEFORE UPDATE ON drawsConfig
         FOR EACH ROW
 
         BEGIN

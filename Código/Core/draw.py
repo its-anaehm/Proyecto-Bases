@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 # The imports include turtle graphics and tkinter modules.
 # The colorchooser and filedialog modules let the user
 # pic a color and a filename.
@@ -324,11 +325,14 @@ class DrawingApplication(tkinter.Frame):
             #filename = tkinter.filedialog.asksaveasfilename(title="Save Picture As...")
             filename = simpleDialog.askstring("Save draw","Write the name of the draw.")
             JSONDraw = drawToJSON()
+
+            backUp = MySQLEngineBackup(self.sgbd)
+            backUp.connect(filename = "Core/connectionConfigBackup.ini")
+
             if filename:
                 result = self.sgbd.insertDraw(drawName=filename, drawConfig=JSONDraw)
-                backUp = MySQLEngineBackup()
-                backUp.connect(filename = "Core/connectionConfigBackup.ini")
                 backUp.insertDraw(self.sgbd.mysql_userId,filename,JSONDraw)
+
                 if result["status"]:
                     fileAbsPath = os.path.join(os.path.abspath("."),"%s.json" % filename)
                     print(fileAbsPath)
@@ -337,6 +341,7 @@ class DrawingApplication(tkinter.Frame):
                     question = messagebox.askyesno(title="Save Draw", message="Draw %s already exists, do you want overwrite it?." % filename)
                     if question:
                         self.sgbd.modifyDraw(result["drawId"], drawToJSON())
+                        backUp.modifyDraw(self.sgbd.mysql_userId, filename, drawToJSON())
         
         fileMenu.add_command(label="Save Ass...",command=saveFile)
 
@@ -541,6 +546,10 @@ class DrawingApplication(tkinter.Frame):
             chooseDraw = ChooseDraw(root,self.sgbd)
             root.mainloop()
             root.destroy()
+            backup = MySQLEngineBackup(self.sgbd)
+            backup.connect(filename = "Core/connectionConfigBackup.ini")
+            
+            backup.deleteDraw(self.sgbd.mysql_userId, chooseDraw.itemName)
             self.sgbd.dropDraw(chooseDraw.itemID)
 
         fileMenu.add_command(command=dropDraw, label="Drop draw")
@@ -554,6 +563,17 @@ class DrawingApplication(tkinter.Frame):
         if self.sgbd.isAdmin():
             fileMenu.add_command(label="Settings", command=settings)
 
+        def downloadDraw():
+            backUp = MySQLEngineBackup(self.sgbd)
+            backUp.connect(filename = "Core/connectionConfigBackup.ini")
+            root = Tk()
+            root.title("Download a Draw")
+            chooseDraw = ChooseDraw(root,self.sgbd)
+            root.mainloop()
+            root.destroy()
+            backUp.download(chooseDraw.itemID)
+
+        fileMenu.add_command(label="Download Draw", command=downloadDraw)
 
         fileMenu.add_command(label="Exit",command=self.master.quit)
 
