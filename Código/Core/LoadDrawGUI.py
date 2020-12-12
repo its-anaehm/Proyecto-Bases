@@ -1,7 +1,5 @@
-from tkinter import ttk
-from tkinter import Tk
 from tkinter import *
-
+from tkinter import ttk
 
 """
 GUI que muestra dibujos almacenados en la base de datos.

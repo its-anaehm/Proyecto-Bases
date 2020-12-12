@@ -1,12 +1,11 @@
 #-*- coding:utf8 -*-
 
-from tkinter.messagebox import showwarning
-from Core.MySQLEngine import MySQLEngine
-from tkinter import ttk
 import tkinter.simpledialog as simpleDialog
 from tkinter import *
-import tkinter
+from tkinter import ttk
+from tkinter.messagebox import showwarning
 
+from Core.MySQLEngine import MySQLEngine
 
 """
 GUI para seleccionar el usuario a alterar

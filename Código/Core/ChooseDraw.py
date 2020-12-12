@@ -1,9 +1,5 @@
 #-*- coding:utf8 -*-
-import tkinter
-from tkinter import TkVersion, ttk
-from tkinter import Tk
-from typing import ValuesView
-from Core.Encryptor import Encryptor
+from tkinter import ttk
 
 """
 GUI que muestra los dibujos y permite realizar una selección.

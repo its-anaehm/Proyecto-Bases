@@ -1,10 +1,9 @@
-from Core.MySQLEngine import MySQLEngine
-from Core.MySQLEngineBackUp import MySQLEngineBackup
+from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
-from tkinter import Tk
-from tkinter import *
 
+from Core.MySQLEngine import MySQLEngine
+from Core.MySQLEngineBackUp import MySQLEngineBackup
 
 """
 GUI para eliminar usuarios
@@ -50,6 +49,8 @@ class DropUserGUI(ttk.Frame):
     @param name nombre del usuario
     """
     def getId(self, name):
+        self.users = self.getUsers()
+        print(self.users)
         for user in self.users:
             if user[1] == name:
                 return user[0]
@@ -62,15 +63,17 @@ class DropUserGUI(ttk.Frame):
     """
     def drop(self) -> None:
         name = self.userList.get(self.userList.curselection())
+        id = self.getId((name))
+        print(name)
         if name == "admin":
-            messagebox.showinfo(title="You can't delete the admin.", message="%s was deleted" % name[0])
-        elif self.sgbd.dropUser(name[0]):
+            messagebox.showinfo(title="No deleted", message="You can't delete the admin.")
+        elif self.sgbd.dropUser(name):
             self.userList.delete(0,'end')
             self.fillUserList()
             backup = MySQLEngineBackup(self.sgbd)
             backup.connect(filename = "Core/connectionConfigBackup.ini")
-            backup.deleteAllUserDraws(self.getId(name[0]))
-            messagebox.showinfo(title="User succesfully deleted", message="%s was deleted" % name[0])
+            backup.deleteAllUserDraws(id)
+            messagebox.showinfo(title="User succesfully deleted", message="%s was deleted" % name)
         else:
             messagebox.showerror(title="Error to drop user",message="Something went wrong to drop the user. Call support")
 

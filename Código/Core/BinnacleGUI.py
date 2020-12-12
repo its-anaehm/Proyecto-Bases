@@ -1,7 +1,4 @@
-import tkinter
-from tkinter import TkVersion, ttk
-from tkinter import Tk
-from typing import ValuesView
+from tkinter import ttk
 
 """
 GUI que muestra los registros de la bitácora.

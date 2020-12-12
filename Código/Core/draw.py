@@ -2,24 +2,21 @@
 # The imports include turtle graphics and tkinter modules.
 # The colorchooser and filedialog modules let the user
 # pic a color and a filename.
-from Core.SettingsGUI import SettingsGUI
-from Core.MySQLEngineBackUp import MySQLEngineBackup
-from tkinter import messagebox
-from tkinter.constants import COMMAND
-from Core.ChooseDraw import ChooseDraw
-import tkinter.simpledialog as simpleDialog
-from Core.AlterUserGUI import ChoseUserToAlterGUI
-from Core.MySQLEngine import MySQLEngine
-from Core.DropUserGUI import DropUserGUI
-from logging import root
-import turtle
+import json
+import os
 import tkinter
 import tkinter.colorchooser
 import tkinter.filedialog
-import json
-from .AddUserGUI import AddUserGUI
+import tkinter.simpledialog as simpleDialog
+import turtle
 from tkinter import Tk
-import os
+from tkinter import messagebox
+
+from Core.ChooseDraw import ChooseDraw
+from Core.MySQLEngine import MySQLEngine
+from Core.MySQLEngineBackUp import MySQLEngineBackup
+from Core.SettingsGUI import SettingsGUI
+
 
 # The following classes define the different commands that
 # are supported by the drawing application.
@@ -341,9 +338,9 @@ class DrawingApplication(tkinter.Frame):
                     question = messagebox.askyesno(title="Save Draw", message="Draw %s already exists, do you want overwrite it?." % filename)
                     if question:
                         self.sgbd.modifyDraw(result["drawId"], drawToJSON())
-                        backUp.modifyDraw(self.sgbd.mysql_userId, filename, drawToJSON())
+                        backUp.modifyDraw(result["drawId"], drawToJSON())
         
-        fileMenu.add_command(label="Save Ass...",command=saveFile)
+        fileMenu.add_command(label="Save As...",command=saveFile)
 
 
 
@@ -549,7 +546,7 @@ class DrawingApplication(tkinter.Frame):
             backup = MySQLEngineBackup(self.sgbd)
             backup.connect(filename = "Core/connectionConfigBackup.ini")
             
-            backup.deleteDraw(self.sgbd.mysql_userId, chooseDraw.itemName)
+            backup.deleteDraw(chooseDraw.itemID)
             self.sgbd.dropDraw(chooseDraw.itemID)
 
         fileMenu.add_command(command=dropDraw, label="Drop draw")

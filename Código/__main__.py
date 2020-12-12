@@ -1,8 +1,7 @@
-from Core.LoginGUI import LoginGUI
 from tkinter import *
-from tkinter import messagebox
 from tkinter import ttk
 
+from Core.LoginGUI import LoginGUI
 
 top = Tk()
 top.title("Picasso")

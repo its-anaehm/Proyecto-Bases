@@ -1,9 +1,8 @@
-from Core.MySQLEngine import MySQLEngine
+from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
-from tkinter import Tk
-from tkinter import *
 
+from Core.MySQLEngine import MySQLEngine
 
 """
 GUI para la agregación de usuarios.

@@ -1,15 +1,13 @@
 #-*- coding:utf8 -*-
+import configparser
 import os
 import subprocess
-
-from tkinter import *
-from tkinter import filedialog, messagebox
-
-from Core.Encryptor import Encryptor
+from tkinter import filedialog
 
 import mysql
 import mysql.connector as DBCon
-import configparser
+
+from Core.Encryptor import Encryptor
 
 """
 Objeto utilizado como interfaz entre la
@@ -167,14 +165,13 @@ class MySQLEngineBackup:
 
     """
     Elimina un dibujo de la base de datos.
-    @param userId : Identificador de usuario en la base de datos.
-    @param drawName : Nombre del dibujo a eliminar.
+    @param id: identificador del dibujo.
     """
-    def deleteDraw(self, userId, drawName):
+    def deleteDraw(self, id):
         try:
             self.cursor.execute(
-                "DELETE FROM Draws WHERE userId = %s and var_name = AES_ENCRYPT(%s,%s)",
-                (userId, drawName, self.sgbd.adminPass)
+                "DELETE FROM Draws WHERE id = %s",
+                (id, )
             )
             self.connection.commit()
             print("Dibujo eliminado de B")
@@ -205,19 +202,17 @@ class MySQLEngineBackup:
         
     """
     Modifica un dibujo de la base de datos de respaldo.
-    @param userId: El id del usuario dueño del dibujo a modificar.
-    @type String
-    @param drawName: El nombre del dibujo a eliminar.
-    @type String
+    @param id: El id del dibujo.
+    @type Int
     @param drawJSON: JSON del dibujo a modificar.
     @type JSON
     """
-    def modifyDraw(self, userId, drawName, drawJSON):
+    def modifyDraw(self, id, drawJSON):
         try:
             encryptor = Encryptor()
             self.cursor.execute(
-                "UPDATE Draws SET blo_drawInfo = %s WHERE userId = %s and var_name = AES_ENCRYPT(%s,%s)",
-                (encryptor.encrypt(drawJSON, self.sgbd.adminPass), userId, drawName, self.sgbd.adminPass)
+                "UPDATE Draws SET blo_drawInfo = %s WHERE id = %s",
+                (encryptor.encrypt(drawJSON, self.sgbd.adminPass), id)
             )
             self.connection.commit()
 

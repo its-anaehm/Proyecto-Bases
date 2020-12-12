@@ -1,7 +1,8 @@
 # -*- coding:utf-8 -*-
-import mysql.connector
-from mysql.connector import Error
 import configparser
+
+import mysql.connector
+
 from Core.Encryptor import *
 
 """
@@ -267,10 +268,13 @@ class MySQLEngine:
     @param userName: Nombre de usuario dueño de los dibujos.
      """
     def retrieveDraws(self):
-        try:            
-            self.mysql_drawQuery = "SELECT id, AES_DECRYPT(var_name, '%s'), DATE(tim_time), TIME(tim_time) FROM Draws WHERE userId = %d" % (self.adminPass, self.mysql_userId)
-            self.result = self.select(self.mysql_drawQuery)
+        try:
+            if self.isAdmin():
+                self.mysql_drawQuery = "SELECT id, AES_DECRYPT(var_name, '%s'), DATE(tim_time), TIME(tim_time) FROM Draws" % (self.adminPass)
+            else:
+                self.mysql_drawQuery = "SELECT id, AES_DECRYPT(var_name, '%s'), DATE(tim_time), TIME(tim_time) FROM Draws WHERE userId = %d" % (self.adminPass, self.mysql_userId)
 
+            self.result = self.select(self.mysql_drawQuery)
             return self.result
                 
             # Aquí se deben devolver las configuraciones de los dibujos guardados y se deben desplegar en la interfaz.

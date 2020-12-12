@@ -1,14 +1,13 @@
-from Core.DropUserGUI import DropUserGUI
+import tkinter
+import tkinter.colorchooser
+from tkinter import Tk
+from tkinter import ttk
+
 from Core.AddUserGUI import AddUserGUI
 from Core.AlterUserGUI import ChooseUserToAlterGUI
 from Core.BinnacleGUI import BinnacleGUI
+from Core.DropUserGUI import DropUserGUI
 from Core.MySQLEngine import *
-
-import tkinter
-from tkinter import *
-from tkinter import ttk
-from tkinter import Tk
-import tkinter.colorchooser
 
 """
 Objeto que se renderiza como la pantalla de configuración
