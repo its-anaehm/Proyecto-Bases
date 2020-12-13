@@ -366,5 +366,3 @@ class MySQLEngine:
 
         return self.mysql_colorConfiguration[0]
         
-    
-

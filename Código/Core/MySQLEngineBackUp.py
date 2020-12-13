@@ -158,7 +158,7 @@ class MySQLEngineBackup:
             self.connection.commit()
 
             subprocess.call(['rm', compressedFilePath])
-            subprocess.call(['rm', fileAbsPath])
+            #subprocess.call(['rm', fileAbsPath])
 
             print("Dibujo insertado")
             return {"status": True, "message": "Draw inserted"}
@@ -261,7 +261,7 @@ class MySQLEngineBackup:
         f.close()
 
 
-
-"""bk = MySQLEngineBackup()
+"""
+bk = MySQLEngineBackup()
 bk.connect(filename="Core/connectionConfigBackup.ini")
-bk.download(24,"Core/pruebaj.json")"""
+bk.insertDraw(1,"holaMundo",'{"draw":["hola"]')"""

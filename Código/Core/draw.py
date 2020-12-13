@@ -306,7 +306,7 @@ class DrawingApplication(tkinter.Frame):
             result.append("]}")
 
             return "".join(result)
-
+        """
         def write(filename, formated=False, tab=1):
             file = open(filename,"w")
             if (formated):
@@ -322,7 +322,7 @@ class DrawingApplication(tkinter.Frame):
                 file.write('{"command":"end"}')
                 file.write("]}")
             file.close()
-
+        """
         def saveFile():
             #filename = tkinter.filedialog.asksaveasfilename(title="Save Picture As...")
             filename = simpleDialog.askstring("Save draw","Write the name of the draw.")
@@ -338,7 +338,6 @@ class DrawingApplication(tkinter.Frame):
                 if result["status"]:
                     fileAbsPath = os.path.join(os.path.abspath("."),"%s.json" % filename)
                     print(fileAbsPath)
-                    write(fileAbsPath)
                 else:
                     question = messagebox.askyesno(title="Save Draw", message="Draw %s already exists, do you want overwrite it?." % filename)
                     if question:
