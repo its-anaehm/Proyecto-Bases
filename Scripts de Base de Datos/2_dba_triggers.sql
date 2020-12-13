@@ -18,7 +18,7 @@ DELIMITER $$
             INSERT INTO Binnacle(userId, tex_event) VALUES(
                 (SELECT Us.id                    
                     FROM Users Us
-                    WHERE AES_ENCRYPT(((SUBSTRING_INDEX(CURRENT_USER(), "@",1))), "admin") = Us.var_user),
+                    WHERE AES_ENCRYPT(((SUBSTRING_INDEX(SESSION_USER(), "@",1))), "admin") = Us.var_user),
                 "Inserción de Usuario"
               );
         END $$
@@ -33,7 +33,7 @@ DELIMITER $$
             INSERT INTO Binnacle(userId, tex_event) VALUES(
                 (SELECT Us.id
                     FROM Users Us
-                    WHERE AES_ENCRYPT(((SUBSTRING_INDEX(CURRENT_USER(), "@",1))), "admin") = Us.var_user),
+                    WHERE AES_ENCRYPT(((SUBSTRING_INDEX(SESSION_USER(), "@",1))), "admin") = Us.var_user),
                 "Eliminación de Usuario"
             );
         END $$
@@ -48,7 +48,7 @@ DELIMITER $$
             INSERT INTO Binnacle(userId, tex_event) VALUES(
                 (SELECT Us.id
                     FROM Users Us
-                    WHERE AES_ENCRYPT(((SUBSTRING_INDEX(CURRENT_USER(), "@",1))), "admin") = Us.var_user),
+                    WHERE AES_ENCRYPT(((SUBSTRING_INDEX(SESSION_USER(), "@",1))), "admin") = Us.var_user),
                 "Modificación de Usuario"
                 );
         END $$    
@@ -63,7 +63,7 @@ DELIMITER $$
             INSERT INTO Binnacle(userId, tex_event) VALUES(
                 (SELECT Us.id
                     FROM Users Us
-                    WHERE AES_ENCRYPT(((SUBSTRING_INDEX(CURRENT_USER(), "@",1))), "admin") = Us.var_user),
+                    WHERE AES_ENCRYPT(((SUBSTRING_INDEX(SESSION_USER(), "@",1))), "admin") = Us.var_user),
                 "Inserción de Dibujo"
                 );
         END $$
@@ -79,7 +79,7 @@ DELIMITER $$
             INSERT INTO Binnacle(userId, tex_event) VALUES(
                 (SELECT Us.id
                     FROM Users Us
-                    WHERE AES_ENCRYPT(((SUBSTRING_INDEX(CURRENT_USER(), "@",1))), "admin") = Us.var_user),
+                    WHERE AES_ENCRYPT(((SUBSTRING_INDEX(SESSION_USER(), "@",1))), "admin") = Us.var_user),
                 "Eliminación de Dibujo"
                 );
         END $$
@@ -95,7 +95,7 @@ DELIMITER $$
             INSERT INTO Binnacle(userId, tex_event) VALUES(
                 (SELECT Us.id
                     FROM Users Us
-                    WHERE AES_ENCRYPT(((SUBSTRING_INDEX(CURRENT_USER(), "@",1))), "admin") = Us.var_user),
+                    WHERE AES_ENCRYPT(((SUBSTRING_INDEX(SESSION_USER(), "@",1))), "admin") = Us.var_user),
                 "Modificación de Dibujo"
             );
 
@@ -126,7 +126,7 @@ DELIMITER $$
             INSERT INTO Binnacle(userId, tex_event) VALUES(
                 (SELECT Us.id
                     FROM Users Us
-                    WHERE AES_ENCRYPT(((SUBSTRING_INDEX(CURRENT_USER(), "@",1))), "admin") = Us.var_user),
+                    WHERE AES_ENCRYPT(((SUBSTRING_INDEX(SESSION_USER(), "@",1))), "admin") = Us.var_user),
                 "Modificación de Configuración de Colores de Dibujo"
             );
 

@@ -92,6 +92,23 @@ class MySQLEngine:
         except mysql.connector.Error as error:
             print("Operación fallida. {}".format(error))
 
+
+    """
+    Se encarga de registrar en la bitácora selección de dibujos por parte de un usuario.
+    @param userName : Nombre de usuario que inició sesión.
+    @type userName: String.
+    """
+    def selectRegister(self, userName:str):
+        try :
+            self.mysql_register = "INSERT INTO Binnacle(userId, tex_event) VALUES((SELECT Us.id FROM Users Us WHERE AES_ENCRYPT('%s','%s') = Us.var_user), 'Visualización de Dibujos.')" % (userName,self.adminPass)
+
+            self.link.execute(self.mysql_register)
+            self.con.commit()
+            print("Registro añadido a Bitácora")
+        
+        except mysql.connector.Error as error:
+            print("Operación fallida. {}".format(error))
+
     
 
     """
@@ -122,7 +139,7 @@ class MySQLEngine:
 
             else:
                 #Asignación de permisos para usuarios operadores
-                self.mysql_grantDraws = "GRANT INSERT, SELECT ON %s.Draws TO '%s'@'%s'" % (self.database, userName, self.server)
+                self.mysql_grantDraws = "GRANT INSERT, SELECT, DELETE ON %s.Draws TO '%s'@'%s'" % (self.database, userName, self.server)
                 self.mysql_grantBinnacle = "GRANT INSERT ON %s.Binnacle TO '%s'@'%s'" % (self.database, userName, self.server)
                 self.mysql_grantUsers = "GRANT SELECT ON %s.Users TO '%s'@'%s'" % (self.database, userName, self.server)
                 self.mysql_grantConfigurations = "GRANT SELECT ON %s.drawsConfig TO '%s'@'%s'" % (self.database, userName, self.server)
@@ -230,7 +247,8 @@ class MySQLEngine:
             encrypt = Encryptor()
             self.link.execute(self.mysql_insert,(self.mysql_userId, drawName, encrypt.encrypt(drawConfig, self.adminPass)))
             self.con.commit()
-            print("Dibujo insertado")
+            print(self.select("SELECT current_user()"))
+            print(self.select("SELECT user()"))
             return {"status":True, "message":"Draw inserted"}
 
     """
@@ -318,7 +336,7 @@ class MySQLEngine:
     def retrieveBinnacleInfo(self) -> list:
         try:
             # ! Devolver el usuario en la primera posición
-            self.mysql_binnacle = self.select("SELECT AES_DECRYPT(Users.var_user, '%s'), tex_event, DATE(tim_time), TIME(tim_time) FROM Binnacle JOIN Users ON Binnacle.userId = Users.id" % self.adminPass) 
+            self.mysql_binnacle = self.select("SELECT AES_DECRYPT(Users.var_user, '%s'), tex_event, DATE(tim_time), TIME(tim_time) FROM Binnacle JOIN Users ON Binnacle.userId = Users.id ORDER BY DATE(tim_time) DESC" % self.adminPass) 
             return self.mysql_binnacle
         except mysql.connector.Error as error:
             print("No se puedieron recuperar los registros de bitácora. {}".format(error))

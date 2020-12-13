@@ -182,7 +182,7 @@ class DrawingApplication(tkinter.Frame):
     def buildWindow(self):
 
         # The master is the root window. The title is set as below.
-        self.master.title("Draw")
+        self.master.title("Picasso")
 
         # Here isi how to create a menu bar. The tearoff=0 means that menus
         # can"t be separated from the window which is a feature of tkinter.
@@ -274,6 +274,7 @@ class DrawingApplication(tkinter.Frame):
                 
             # This line is necessary to update the window after the picture is drawn.
             screen.update()
+            self.sgbd.selectRegister(self.sgbd.user)
             
 
         fileMenu.add_command(label="Load...",command=loadFile)
@@ -558,7 +559,7 @@ class DrawingApplication(tkinter.Frame):
             root.mainloop()
 
         if self.sgbd.isAdmin():
-            fileMenu.add_command(label="Settings", command=settings)
+            fileMenu.add_command(label="Configure", command=settings)
 
         def downloadDraw():
             backUp = MySQLEngineBackup(self.sgbd)
@@ -572,7 +573,11 @@ class DrawingApplication(tkinter.Frame):
 
         fileMenu.add_command(label="Download Draw", command=downloadDraw)
 
-        fileMenu.add_command(label="Exit",command=self.master.quit)
+        def quitApp():
+            self.sgbd.closeDatabase()
+            self.master.destroy()
+
+        fileMenu.add_command(label="Exit",command=quitApp)
 
 
 
