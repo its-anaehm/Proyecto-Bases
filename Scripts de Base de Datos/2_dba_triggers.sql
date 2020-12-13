@@ -184,9 +184,6 @@ DELIMITER $$
                 SET NEW.var_name = AES_ENCRYPT(NEW.var_name, "admin");
             END IF;
 
-            IF OLD.jso_drawInfo <> NEW.jso_drawInfo THEN
-                SET NEW.jso_drawInfo = AES_ENCRYPT(NEW.jso_drawInfo, "admin");
-            END IF;
         END $$
 
     /*
@@ -206,6 +203,15 @@ DELIMITER $$
             END IF;
         END $$
 
+    DROP TRIGGER IF EXISTS tg_AddCodedColorConfiguration $$
+    CREATE TRIGGER tg_AddCodedColorConfiguration BEFORE INSERT ON drawsConfig
+        FOR EACH ROW
+        BEGIN
+            SET NEW.var_penColor = AES_ENCRYPT(NEW.var_penColor, "admin");        
+            SET NEW.var_fillColor = AES_ENCRYPT(NEW.var_fillColor, "admin");        
+        END $$
+
 DELIMITER ;
 
 CALL sp_addMainUser("Administrador");
+INSERT INTO drawsConfig(var_penColor, var_fillColor) VALUES ("#000000", "#000000");

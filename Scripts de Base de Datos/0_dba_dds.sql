@@ -32,8 +32,8 @@ CREATE TABLE Draws(
 )   COMMENT "Tabla que almacena los dibujos creados en la aplicación de dibujo.";
 
 CREATE TABLE drawsConfig(    
-    var_penColor VARCHAR(50) NOT NULL DEFAULT "#000000" COMMENT "Configuración del atributo PenColor en la aplicación Draw.",
-    var_fillColor VARCHAR(50) NOT NULL DEFAULT "#000000" COMMENT "Configuración del atributo FillColor en la aplicación Draw."
+    var_penColor VARCHAR(50) NOT NULL COMMENT "Configuración del atributo PenColor en la aplicación Draw.",
+    var_fillColor VARCHAR(50) NOT NULL COMMENT "Configuración del atributo FillColor en la aplicación Draw."
 ) COMMENT "Tabla que guarda los datos que se configuran para las opciones de FillColor y PenColor.";
 
 CREATE TABLE Binnacle(
@@ -48,4 +48,4 @@ CREATE TABLE Binnacle(
         ON UPDATE CASCADE
 ) COMMENT "Tabla que almacena registros de los eventos de la aplicación.";
 
-INSERT INTO drawsConfig() VALUES ();
+
