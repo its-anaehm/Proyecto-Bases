@@ -184,9 +184,6 @@ DELIMITER $$
                 SET NEW.var_name = AES_ENCRYPT(NEW.var_name, "admin");
             END IF;
 
-            IF OLD.jso_drawInfo <> NEW.jso_drawInfo THEN
-                SET NEW.jso_drawInfo = AES_ENCRYPT(NEW.jso_drawInfo, "admin");
-            END IF;
         END $$
 
     /*

@@ -268,12 +268,12 @@ class MySQLEngine:
     """
     Modifica los datos que representan un dibujo en la base de datos.
     @param drawId: Id de la base de datos
+    @param drawJson: texto que representa un json
     """
     def modifyDraw(self, drawId:int, drawJson):
         try:
-            self.mysql_drawUpdate = "UPDATE Draws SET jso_drawInfo = '%s' WHERE id = %d" % (drawJson, drawId)
-
-            self.link.execute(self.mysql_drawUpdate)
+            encrypt = Encryptor()
+            self.link.execute("UPDATE Draws SET jso_drawInfo = %s WHERE id = %s", (json.dumps(encrypt.encryptJSON(drawJson, self.adminPass)), drawId))
             self.con.commit()
         except mysql.connector.Error as error:
             print("Dibujo no se pudo modificar. {}".format(error))
