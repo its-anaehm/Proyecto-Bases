@@ -141,8 +141,6 @@ class MySQLEngineBackup:
             # Comprime la el archivo en formato .gz mediante la terminal
             subprocess.call(['gzip', '-9', fileAbsPath])  
             compressedFilePath = "%s.gz" % fileAbsPath
-            #compressedFilePath = "%s" % fileAbsPath
-            
 
             f = open(compressedFilePath, "rb")
             data = f.read()  # Lee los bits del archivo comprimido
@@ -158,7 +156,6 @@ class MySQLEngineBackup:
             self.connection.commit()
 
             subprocess.call(['rm', compressedFilePath])
-            #subprocess.call(['rm', fileAbsPath])
 
             print("Dibujo insertado")
             return {"status": True, "message": "Draw inserted"}
@@ -208,14 +205,31 @@ class MySQLEngineBackup:
     @type JSON
     """
     def modifyDraw(self, id, drawJSON):
+        drawName = "temp"
         try:
             encryptor = Encryptor()
+
+            fileAbsPath = os.path.join(os.path.abspath("."), "%s.json" % drawName)
+            f = open(fileAbsPath, "w")  # Se guardará como un archivo .json
+            f.write(encryptor.encrypt(drawJSON, self.sgbd.adminPass))
+            f.close()
+
+            # Comprime la el archivo en formato .gz mediante la terminal
+            subprocess.call(['gzip', '-9', fileAbsPath])  
+            compressedFilePath = "%s.gz" % fileAbsPath
+
+            f = open(compressedFilePath, "rb")
+            data = f.read()  # Lee los bits del archivo comprimido
+            f.close()
+            # Guarda los bits en la base de datos
+            encryptor = Encryptor()         
+
             self.cursor.execute(
                 "UPDATE Draws SET blo_drawInfo = %s WHERE id = %s",
-                (encryptor.encrypt(drawJSON, self.sgbd.adminPass), id)
+                (data, id)
             )
-            self.connection.commit()
-
+            self.connection.commit()          
+            subprocess.call(['rm', compressedFilePath])
             print("Dibujo actualizado")
             return {"status":True, "message":"Draw updated"}
 
@@ -231,7 +245,6 @@ class MySQLEngineBackup:
         
         self.cursor.execute(
             "SELECT blo_drawInfo FROM Draws WHERE id = %s",
-            #"SELECT blo_drawInfo FROM Draws WHERE id = %s",
             (drawId, )
         )
         fn = filedialog.asksaveasfilename(initialdir=os.getcwd(), title="Save File")
@@ -259,9 +272,3 @@ class MySQLEngineBackup:
         f = open(fn,"w")
         f.write(content)
         f.close()
-
-
-"""
-bk = MySQLEngineBackup()
-bk.connect(filename="Core/connectionConfigBackup.ini")
-bk.insertDraw(1,"holaMundo",'{"draw":["hola"]')"""

@@ -282,19 +282,7 @@ class DrawingApplication(tkinter.Frame):
             
 
         fileMenu.add_command(label="Load...",command=loadFile)
-        """
-        # The write function writes an XML file to the given filename
-        def write(filename):
-            file = open(filename, "w")
-            file.write("<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n"")
-            file.write("<GraphicsCommands>\n")
-            for cmd in self.graphicsCommands:
-                file.write("    "+str(cmd)+"\n")
-            
-            file.write("</GraphicsCommands>\n"")
 
-            file.close()
-        """
 
         def drawToJSON():
             result = []
