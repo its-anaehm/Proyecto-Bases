@@ -245,7 +245,7 @@ class MySQLEngine:
         else:
             self.mysql_insert = "INSERT INTO Draws(userId, var_name, jso_drawInfo) VALUES (%s, %s, %s)"
             encrypt = Encryptor()
-            self.link.execute(self.mysql_insert,(self.mysql_userId, drawName, json.dumps(encrypt.encryptJSON(drawConfig, self.adminPass))))
+            self.link.execute(self.mysql_insert,(self.mysql_userId, drawName,json.dumps(encrypt.encryptJSON(drawConfig, self.adminPass))))
             self.con.commit()            
             return {"status":True, "message":"Draw inserted"}
 
@@ -326,7 +326,7 @@ class MySQLEngine:
 
         self.result = self.select(self.mysql_drawConfig)
         decrypt = Encryptor()
-        return decrypt.decryptJSON(self.result[0][0], self.adminPass)
+        return decrypt.decryptJSON(json.loads(self.result[0][0]), self.adminPass)
 
     """
     Recupera desde la base de datos la información de la bitácora
