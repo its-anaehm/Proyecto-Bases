@@ -49,6 +49,3 @@ CREATE TABLE Binnacle(
 ) COMMENT "Tabla que almacena registros de los eventos de la aplicación.";
 
 INSERT INTO drawsConfig() VALUES ();
-
-
-

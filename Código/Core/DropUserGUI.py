@@ -50,7 +50,6 @@ class DropUserGUI(ttk.Frame):
     """
     def getId(self, name):
         self.users = self.getUsers()
-        print(self.users)
         for user in self.users:
             if user[1] == name:
                 return user[0]
@@ -64,7 +63,6 @@ class DropUserGUI(ttk.Frame):
     def drop(self) -> None:
         name = self.userList.get(self.userList.curselection())
         id = self.getId((name))
-        print(name)
         if name == "admin":
             messagebox.showinfo(title="No deleted", message="You can't delete the admin.")
         elif self.sgbd.dropUser(name):

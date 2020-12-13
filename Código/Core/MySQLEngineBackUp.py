@@ -241,7 +241,6 @@ class MySQLEngineBackup:
 
         r = self.cursor.fetchall()
 
-        print("Esto es r",r)
 
         f = open(fnc, "wb")
 

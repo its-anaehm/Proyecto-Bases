@@ -213,7 +213,11 @@ class DrawingApplication(tkinter.Frame):
 
         # The parse function adds the contents of an XML file to the sequence
         def parse(JSONString):
-            JSONData = json.loads(JSONString)
+
+            if type(JSONString) == str:
+                JSONData = json.loads(JSONString)
+            else:
+                JSONData = JSONString
 
             graphicsCommands = JSONData["Draw"]
 
